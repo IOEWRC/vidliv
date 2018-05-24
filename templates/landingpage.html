@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <p><h1>VidLIV: Live Video Streaming and Broadcasting</h1></p>
+    <a href="{% url 'registration_register' %}">Create New Account: Signup</a></br>
+    <a href="{% url 'auth_login' %}">Already a user: Login</a><br>
+    <a href="{% url 'auth_password_reset' %}">Forgot Password: Reset</a>
+{% endblock %}

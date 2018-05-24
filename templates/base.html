@@ -1,0 +1,16 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title_name %}vidliv{% endblock %}</title>
+    {# stylesheet for respective pages goes here #}
+    {% block stylesheet %}{% endblock %}
+</head>
+<body>
+{# this block name must not be changed #}
+{% block content %}{% endblock %}
+{# javascript goes herer #}
+{% block script %}{% endblock %}
+</body>
+</html>
