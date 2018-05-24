@@ -8,7 +8,8 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-DATABASES = {  # replace with your own database credential
+DATABASES = {  # set ENV `DATABASE_NAME' to `postgresql' to use otherwise it will use default sqllite3
+    # replace with your own database credential
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'vidliv',
@@ -16,9 +17,7 @@ DATABASES = {  # replace with your own database credential
         'PASSWORD': 'password',
         'HOST': 'localhost',
         'PORT': '5432',
-    } if config('DATABASE_POSTGRESQL') else {
-        # set environment variable to `DATABASE_POSTGRESQL` to False
-        # if you want to use default sqlite3
+    } if config('DATABASE_NAME') == 'postgresql' else {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(settings.BASE_DIR, 'db.sqlite3'),
     }
