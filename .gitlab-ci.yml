@@ -53,9 +53,9 @@ test:
 production:
  type: deploy
  script:
- — apt-get update -qy
- — apt-get install -y ruby-full rubygems-integration
- — gem install dpl
- — dpl --provider=heroku --app=vidlive --api-key=$HEROKU_SECRET_KEY
+ - apt-get update -qy
+ - apt-get install -y ruby-full rubygems-integration
+ - gem install dpl
+ - dpl --provider=heroku --app=vidlive --api-key=$HEROKU_SECRET_KEY
  only:
- — master
+ - master
