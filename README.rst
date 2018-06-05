@@ -36,6 +36,8 @@ Now install the requirements
 
 Migrate the database files
  - ``python manage.py migrate``
-And open in local development server
+And open in local development using ssl server(for `https`)
+ - ``python manage.py runsslserver``
+  OR simply open in local development server (for `http`)
  - ``python manage.py runserver``
  
