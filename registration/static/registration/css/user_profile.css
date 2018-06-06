@@ -1,0 +1,177 @@
+body {
+    background-color:#222534 /*#6F6349*/;
+    text-align: center;
+    font-family: 'Shadows Into Light', cursive;
+    font-size: 16px;
+    color: white;
+}
+
+#loginbox {
+    margin-top: 30px;
+}
+
+#loginbox > div:first-child {
+    padding-bottom: 10px;
+}
+
+.iconmelon {
+    display: block;
+    margin: auto;
+}
+
+#form > div {
+    margin-bottom: 25px;
+}
+
+#form > div:last-child {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.panel {
+    background-color: transparent;
+}
+
+.panel-body {
+    padding-top: 30px;
+    background-color: rgba(2555,255,255,.3);
+}
+
+#particles {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    z-index: -2;
+}
+
+.iconmelon,
+.im {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  display: block;
+  fill: #525151;
+}
+
+.iconmelon:after,
+.im:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+ .destacados{
+    padding: 70px 0;
+    text-align: center;
+
+}
+.destacados > div:hover > div{
+    margin-top: -10px;
+
+	transition: 0.5s;
+}
+.box1 {
+    /* See "NOTE 3" */
+    position:relative;
+    z-index:1;
+    width:500px;
+    padding:20px;
+    margin:20px auto;
+     border: 1px solid rgb(200, 200, 200);
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 5px 5px 2px;
+	background: rgba(200, 200, 200, 0.1);
+        border-radius: 4px;
+}
+
+.box1 h3 {
+    position:relative;
+    padding:10px 30px;
+    margin:0 -30px 20px;
+    font-size:28px;
+    line-height:32px;
+    font-weight:bold;
+    text-align:center;
+    color:#fff;
+    /*background:#cc0000;*/
+    /* css3 extras */
+        background: -webkit-linear-gradient(90deg, #2caab3 0%, #2c8cb3 100%);
+    background: red; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(90deg, #2caab3 0%, #2c8cb3 100%); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(90deg, #2caab3 0%, #2c8cb3 100%); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(90deg, #2caab3 0%, #2c8cb3 100%); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(90deg, #2caab3 0%, #2c8cb3 100%); /* Standard syntax (must be last) */
+    text-shadow:0 1px 1px rgba(0,0,0,0.2);
+    -webkit-box-shadow:0 1px 1px rgba(0,0,0,0.2);
+       -moz-box-shadow:0 1px 1px rgba(0,0,0,0.2);
+            box-shadow:0 1px 1px rgba(0,0,0,0.2);
+    /* See "NOTE 1" */
+    zoom:1;
+}
+
+.box1 h3:before,
+.box1 h3:after {
+    content:"";
+    position:absolute;
+    /* See "NOTE 2" */
+    z-index:-1;
+    top:100%;
+    left:0;
+    border-width:0 9px 10px 0;
+    border-style:solid;
+    border-color:transparent #B7B3B3;
+}
+
+.box1 h3:after {
+    left:auto;
+    right:0;
+    border-width:0 0 10px 9px;
+}
+
+
+/*buttons*/
+.button {
+  border-radius: 4px;
+  background-color: #f4511e;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 28px;
+  padding: 20px;
+  width: 200px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.button span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.button:hover span {
+  padding-right: 25px;
+}
+
+.button:hover span:after {
+  opacity: 1;
+  right: 0;
+}
