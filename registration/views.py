@@ -13,6 +13,7 @@ from django.views.generic.edit import FormView
 
 from registration.forms import ResendActivationForm
 from django.contrib.auth.models import User
+from .forms import UserForm, ProfileForm
 
 REGISTRATION_FORM_PATH = getattr(settings, 'REGISTRATION_FORM',
                                  'registration.forms.RegistrationForm')
@@ -186,3 +187,19 @@ def view_profile(request, pk=None):
         user = request.user
     return render(request, 'registration/user_profile.html', {'user': user})
 
+
+def edit_profile(request):
+    if request.method == "POST":
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            return redirect('user_profile')
+    else:
+        user_form = UserForm(instance=request.user)
+        profile_form = ProfileForm(instance=request.user.profile)
+    return render(request, 'registration/edit_profile.html', {
+        'user_form': user_form,
+        'profile_form': profile_form
+    })
