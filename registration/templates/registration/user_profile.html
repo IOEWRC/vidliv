@@ -9,7 +9,7 @@
 {% block content %}
     <div class="container">
     <div class="row destacados">
-        <div class="col-md-offset-4 col-md-4">
+        <div class="col-md-offset-3 col-md-4">
             <div class="box1">
                 {% if not user.profile.avatar %}
                     <img src="https://www.atomix.com.au/media/2015/06/atomix_user31.png" class="img-circle img-thumbnail">
@@ -28,6 +28,7 @@
             <button class="button" href="#"><span>Call </span></button>
                 <br><hr>
             </div>
+        <a href="{% url 'edit_profile' %}" class="button" >Update Profile</a>
         </div>
     </div>
 
