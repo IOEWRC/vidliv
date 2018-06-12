@@ -6,9 +6,87 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/test_stylesheet.css' %}"/>
 {% endblock %}
 
+{% block script %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.pubnub.com/pubnub-3.7.14.min.js"></script>
+    <script src="https://cdn.pubnub.com/webrtc/webrtc.js"></script>
+{#    <script src="https://cdn.pubnub.com/webrtc/rtc-controller.js"></script>#}
+    <script>
+        var video_out = document.getElementById('vid-box');
+        {#var vid_thumb = document.getElementById('vid-thumb');#}
+        $(document).ready(function () {
+            var phone = window.phone = PHONE({
+                number: '{{ request.user.username }}' || 'Anonymous',
+                publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
+                subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda',
+            });
+            phone.ready(function () {});
+            phone.receive(function (session) {
+                session.connected(function (session) {
+                    $('#myModal').modal();
+                    video_out.appendChild(session.video);
+                });
+                session.ended(function (session) {
+                    video_out.innerHTML = '';
+                    $('#myModal').modal('hide');
+                })
+            });
+        });
+        function showModal(username) {
+            $('#myModal').modal();
+            if (!window.phone) alert("Login First!");
+            else phone.dial(username);
+        }
+    </script>
+{% endblock %}
+
 {% block content %}
 <p><h1>Welcome to VidLIV</h1></p>
 <p>Coming soon</p>
+    <div id="userList">
+    <table>
+        <thead>
+        <tr>
+            <td>users</td>
+            <td>actions</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for usr in user_list %}
+            <tr>
+            <td>{{ usr.username }}</td>
+            <td>
+                <button type="button" class="btn btn-default btn-lg" id="myBtn" onclick="return showModal('{{ usr.username }}')">Call</button>
+            </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 id="callModalTitle"><span class="glyphicon glyphicon-lock"></span> Calling</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div id="vid-box"></div>
+                    <div id="vid-thumb"></div>
+                </div>
+                <div class="modal-footer">
+{#                    <button type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancel</button>#}
+{#                    <p>Not a member? <a href="#">Sign Up</a></p>#}
+{#                    <p>Forgot <a href="#">Password?</a></p>#}
+                </div>
+            </div>
+        </div>
+    </div>
+
 <p>You're {{ request.user.username }}</p>
 <a href="{% url 'auth_logout' %}">Logout</a><br>
 <a href="{% url 'auth_password_change' %}">Change password</a>
