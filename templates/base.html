@@ -2,15 +2,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Standard Meta -->
     <meta charset="UTF-8">
-    <title>{% block title_name %}vidliv{% endblock %}</title>
-    {# stylesheet for respective pages goes here #}
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="icon" href="{% static 'img/favicon.ico' %}">
+    <!-- Title here -->
+    <title>{% block title %}vidliv{% endblock %}</title>
+    <!-- Css files link here -->
+    <link rel="stylesheet" href="{% static 'css/semantic.min.css' %}">
+   {%comment%} <link rel="stylesheet" href="{% static 'css/test_stylesheet.css' %}">{%endcomment%}
+    <!-- Fonts and icons -->
+    <link href="https://fonts.googleapis.com/css?family=Oleo+Script+Swash+Caps" rel="stylesheet">
+    <link href=""
+
+    <!-- {# stylesheet for respective pages goes here #} -->
     {% block stylesheet %}{% endblock %}
 </head>
 <body>
+{% block navbar %} {% include 'navbar.html' %} {% endblock navbar %}
 {# this block name must not be changed #}
 {% block content %}{% endblock %}
-{# javascript goes herer #}
-{% block script %}{% endblock %}
+
 </body>
+<script type="text/javascript" src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/semantic.min.js' %}"></script>
+{# javascript goes here #}
+{% block script %}{% endblock %}
+<script>
+    $(document)
+    .ready(function() {
+      // show dropdown on hover
+      $('.navmenu.menu  .ui.dropdown').dropdown({
+        on: 'hover'
+      });
+    });
+</script>
 </html>
