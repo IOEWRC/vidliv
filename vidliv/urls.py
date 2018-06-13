@@ -22,7 +22,7 @@ from . import extra_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('registration.backends.default.urls')),
-    path('home/', include('test_home_app.urls')),
+    path('home/', include('home.urls')),
     path('', extra_views.landing_page, name='landing_page'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) \
               + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

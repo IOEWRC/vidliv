@@ -5,10 +5,10 @@ from django.contrib.auth.models import User
 
 # Create your views here.
 # def home(request):
-#     return render(request, 'test_home_app/home.html')
+#     return render(request, 'home/home.html')
 
 
 class UserListView(ListView):
     model = User
     context_object_name = 'user_list'
-    template_name = 'test_home_app/home.html'
+    template_name = 'home/home.html'
