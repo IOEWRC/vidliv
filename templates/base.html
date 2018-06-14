@@ -6,8 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}vidliv{% endblock %}</title>
     {# stylesheet for respective pages goes here #}
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
+    {% comment %} <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> {% endcomment %}
+    <link rel="stylesheet" href="{% static 'css/semantic.min.css' %}"/>
+    <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
+    <script src="{% static 'js/semantic.min.js'%}"></script>
+    {% comment %} <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> {% endcomment %}
     {% block stylesheet %}{% endblock %}
 </head>
 <body>
