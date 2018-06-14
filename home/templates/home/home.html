@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
-{% load static%}
+{% load static %}
 {% block title_name %}VidLIV: Home{% endblock %}
 
 {% block stylesheet %}
 {% endblock %}
 
 {% block script %}
-    <script src="https://cdn.pubnub.com/pubnub-3.7.14.min.js"></script>
-    <script src="https://cdn.pubnub.com/webrtc/webrtc.js"></script>
-    <script src="https://cdn.pubnub.com/webrtc/rtc-controller.js"></script>
+    <script src="{% static 'home/js/pubnub.js' %}"></script>
+    <script src="{% static 'home/js/webrtc.js' %}"></script> {# webrtc version 2 #}
+    {% comment %}
     <script>
         var video_out = document.getElementById('vid-box');
         var vid_thumb = document.getElementById('vid-thumb');
@@ -51,7 +51,7 @@
                 else alert('User is offline');
             });
         }
-    
+
         $('#endCall').click(function () {
             ctrl.hangup();
             $('.fullscreen.modal').modal('hide');
@@ -66,6 +66,36 @@
 	        if (!video) $('#pauseCall').html('Unpause');
 	        else $('#pauseCall').html('Pause');
         })
+    </script>
+    {% endcomment %}
+    <script>
+    $(document).ready(() => {
+        var phone = window.phone = PHONE({
+            number: '{{ request.user.username }}' || 'Anonymous',
+            publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
+            subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda',
+            ssl: true,
+        });
+        phone.ready(() => {
+            // TODO add some callbacks if required.
+        });
+        phone.receive(session => {
+            session.connected(session => {
+                phone.$('vid-box').appendChild(session.video);
+                $('.fullscreen.modal').modal('show');
+            });
+            // TODO add callback for session end
+        });
+    });
+    function showModal(username) {
+        $('.fullscreen.modal').modal('show');
+        $('.fullscreen.modal').modal({
+                closable: true
+        });
+        var session = phone.dial(username);
+    }
+
+
     </script>
 {% endblock %}
 
@@ -100,7 +130,7 @@
         </div>
         <div class="content">
             <div id="vid-box"></div>
-            <div id="vid-thumb"></div>
+{#            <div id="vid-thumb"></div>#}
         </div>
         <div class="actions">
           <div class="ui button cancel" id="endCall">End</div>
