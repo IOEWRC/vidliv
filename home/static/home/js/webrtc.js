@@ -368,7 +368,7 @@ const PHONE = window.PHONE = config => {
         // Video Settings
         video.width  = snap.width;
         video.height = snap.height;
-        video.src    = URL.createObjectURL(stream);
+        video.srcObject  = stream;
         video.volume = 0.0;
 
         // Start Video Stream
@@ -397,7 +397,7 @@ const PHONE = window.PHONE = config => {
         let talk   = get_conversation(number);
 
         vid.setAttribute( 'autoplay', 'autoplay' );
-        vid.src = URL.createObjectURL(stream);
+        vid.srcObject = stream;
 
         talk.video = vid;
         talk.connect(talk);

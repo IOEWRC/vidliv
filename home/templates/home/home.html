@@ -3,9 +3,13 @@
 {% block title_name %}VidLIV: Home{% endblock %}
 
 {% block stylesheet %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
 {% endblock %}
 
 {% block script %}
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
     <script src="{% static 'home/js/pubnub.js' %}"></script>
     <script src="{% static 'home/js/webrtc.js' %}"></script> {# webrtc version 2 #}
     {% comment %}
@@ -81,17 +85,16 @@
         });
         phone.receive(session => {
             session.connected(session => {
-                phone.$('vid-box').appendChild(session.video);
-                $('.fullscreen.modal').modal('show');
+                document.getElementById('vid-box').appendChild(session.video);
+                //$('.fullscreen.modal').modal('show');
+                $('#myModal').modal();
             });
             // TODO add callback for session end
         });
     });
     function showModal(username) {
-        $('.fullscreen.modal').modal('show');
-        $('.fullscreen.modal').modal({
-                closable: true
-        });
+        //$('.fullscreen.modal').modal('show');
+        $('#myModal').modal();
         var session = phone.dial(username);
     }
 
@@ -123,22 +126,52 @@
     </table>
     </div>
     <!--symentic modal-->
-    <div class="ui modal fullscreen">
+    <!--<div class="ui modal fullscreen">
         <i class="close icon"></i>
         <div class="header">
           Calling
         </div>
         <div class="content">
-            <div id="vid-box"></div>
-{#            <div id="vid-thumb"></div>#}
+            {% comment %} <div id="vid-box"></div> {% endcomment %}
+            {% comment %} <div id="vid-thumb"></div> {% endcomment %}
         </div>
         <div class="actions">
           <div class="ui button cancel" id="endCall">End</div>
           <div class="ui button" id="muteCall">Mute</div>
           <div class="ui button" id="pauseCall">Pause</div>
         </div>
+      </div>-->
+      <div class="modal" id="myModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+          
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Modal Heading</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="modal-body">
+              <div id='vid-box'></div>
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                
+              <button type="button" class="btn btn-danger" data-dismiss="modal">END</button>
+              <button type="button" >Pause</button>
+              <button type="button">Mute</button>
+            </div>
+            
+          </div>
+        </div>
       </div>
+      
+    </div>
+      
 
+      <div id="vid-box"></div>
 <p>You're {{ request.user.username }}</p>
 <a href="{% url 'auth_logout' %}">Logout</a><br>
 <a href="{% url 'auth_password_change' %}">Change password</a>
