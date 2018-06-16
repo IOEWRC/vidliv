@@ -63,29 +63,13 @@
         </tbody>
     </table>
     </div>
-    <!--symentic modal-->
-    <!--<div class="ui modal fullscreen">
-        <i class="close icon"></i>
-        <div class="header">
-          Calling
-        </div>
-        <div class="content">
-            {% comment %} <div id="vid-box"></div> {% endcomment %}
-            {% comment %} <div id="vid-thumb"></div> {% endcomment %}
-        </div>
-        <div class="actions">
-          <div class="ui button cancel" id="endCall">End</div>
-          <div class="ui button" id="muteCall">Mute</div>
-          <div class="ui button" id="pauseCall">Pause</div>
-        </div>
-      </div>-->
-      <div class="modal" id="myModal">
+      <div class="modal" id="myModalVideoCall">
         <div class="modal-dialog">
           <div class="modal-content">
           
             <!-- Modal Header -->
             <div class="modal-header">
-              <h4 class="modal-title">Modal Heading</h4>
+              <h4 class="modal-title">In Call</h4>
               <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             
@@ -98,8 +82,55 @@
             <div class="modal-footer">
                 
               <button type="button" class="btn btn-danger" data-dismiss="modal">END</button>
-              <button type="button" >Pause</button>
-              <button type="button">Mute</button>
+              <button type="button" id="callPause">Pause</button>
+              <button type="button" id="callMute">Mute</button>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+      <div class="modal" id="myModalRequestCall">
+        <div class="modal-dialog">
+          <div class="modal-content">
+          
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Calling</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="modal-body">
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                
+              <button type="button" class="btn btn-danger" data-dismiss="modal" id="cancelCallRequest">Cancel Request</button>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+      <div class="modal" id="myModalAcceptCall">
+        <div class="modal-dialog">
+          <div class="modal-content">
+          
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Accept Call</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+            <!-- Modal body -->
+            <div class="modal-body">
+            </div>
+            
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                
+              <button type="button" class="btn btn-danger" data-dismiss="modal" id="denyCall">Deny</button>
+              <button type="button" id="acceptCall">Pause</button>
             </div>
             
           </div>
