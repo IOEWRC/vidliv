@@ -1,44 +1,50 @@
-{% load static %}
+{%load static %}
 <style>
-  body {
-    background-color: #FFFFFF;
-  }
-  .main.container{
-    margin-top: 6em;
-  }
-  .navmenu.menu .header1{
-    font-size: 25px;
-    font-family: 'Oleo Script Swash Caps', cursive;
-  }
-</style>
-<div class="ui borderless fixed stackable navmenu menu">
-      <a href="{%url 'landing_page'%}" class="header1 item">
-        <!-- <img class="logo" src="{% static 'img/logo.png'%}"> -->
-        Vidliv
-      </a>
-      {% if user.is_authenticated %}
-      <div class="ui right item">
-          <div class="ui left icon input">
-            <input placeholder="Search users..." type="text">
-            <i class="user link icon"></i>
-          </div>
-      </div>
-      {% endif %}
-      <div class="ui right item">
-          {% if not user.is_authenticated %}
-        <div><a href="{%url 'registration_register'%}" class="ui button primary">Signup</a></div>
-        <div><a href="{% url 'auth_login' %}" class="ui button positive">Login</a></div>
-        {% endif %}
+    body {
+      background-color: #f2f2f2;
+      margin: 10em;
+    }
+    .navmenu.menu .header1{
+      font-size: 25px;
+      font-family: 'Oleo Script Swash Caps', cursive;
+    }
+    
+  </style>
+  
+  <div class="ui borderless fixed navmenu menu">
+        <a href="{%url 'landing_page'%}" class="header1 item">
+          <!-- <img class="logo" src="{% static 'img/logo.png'%}"> -->
+          Vidliv
+        </a>
         {% if user.is_authenticated %}
-      <div class=" ui dropdown item">
-        Settings <i class="dropdown icon"></i>
-        <div class="menu">
-          <a class="item" href="#">Change Password</a>
-          <a class="item" href="#">Edit Profile</a>
-          <div class="divider"></div>
-          <div class="header">Rowdy</div>
+        <div class="ui right item">
+            <div class="ui left icon input">
+              <input placeholder="Search users..." type="text">
+              <i class="user link icon"></i>
+            </div>
         </div>
+        {% endif %}
+  
+        <div class="ui right item">
+            {% if not user.is_authenticated %}
+              
+          <div><a href="{%url 'registration_register'%}" class="ui button primary">Signup</a></div>
+          <div><a href="{% url 'auth_login' %}" class="ui button positive">Login</a></div>
+
+          {% endif %}
+
+        {% if user.is_authenticated %}
+        <div class=" ui dropdown item">
+          Settings <i class="dropdown icon"></i>
+          <div class="menu">
+            <a class="item" href="{%url 'auth_password_change' %}">Change Password</a>
+            <a class="item" href="{%url ''}">Edit Profile</a>
+            <a class="item" href="{%url 'auth_logout' %}">Log Out</a>
+            <div class="divider"></div>
+            <div class="header">Rowdy</div>
+          </div>
+          </div>
+          {%endif%}
         </div>
-        {%endif%}
-      </div>
-  </div>
+    </div>
+    
