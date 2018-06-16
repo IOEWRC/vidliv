@@ -13,38 +13,93 @@
 <script src="{% static 'home/js/pubnub.js' %}"></script>
 <script src="{% static 'home/js/webrtc.js' %}"></script>
 <script>
-    $(document).ready(() => {
-        var phone = window.phone = PHONE({
-            number: '{{ request.user.username }}' || 'Anonymous',
-            publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
-            subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda',
-            ssl: true,
-        });
-        phone.ready(() => {
-            // TODO add some callbacks if required.
-        });
-        phone.receive(session => {
-            session.connected(session => {
-                document.getElementById('vid-box').appendChild(session.video);
-                //$('.fullscreen.modal').modal('show');
-                $('#myModal').modal();
-            });
-            session.ended(session => {
-                document.getElementById('vid-box').innerHTML = '';
-                $('#myModal').modal('hide');
-            })
-        });
+    const pubnubmain = new PubNub({
+        publishKey: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
+        subscribeKey: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda',
+        ssl: true
     });
-    function showModal(username) {
-        //$('.fullscreen.modal').modal('show');
-        $('#myModal').modal();
-        var session = phone.dial(username);
-    }
-    $('#callEnd').click(() => {
-        phone.hangup();
-        $('#myModal').modal('hide');
-    });
+    pubnubmain.addListener({
+        status: statusEvent => {
+            if (statusEvent.category === "PNConnectedCategory") {
+                // TODO connect event
+            } else if (statusEvent.category === "PNUnknownCategory") {
+                var newState = {
+                    new: 'error'
+                };
+                pubnubmain.setState(
+                    {
+                        state: newState
+                    },
+                    function (status) {
+                        console.log(statusEvent.errorData.message)
+                    }
+                );
+            }
 
+        },
+        message: messageEvent => {
+            if (messageEvent.message.type === 'callRequest') {
+                $('#myModalAcceptCall').modal();
+                $('#requestCallDeny').click(() => {
+                    pubnubmain.publish({
+                        message: {
+                            type: 'callRequestDeny',
+                            id: pubnubmain.getUUID(),
+                            number: '{{ request.user.username }}'
+                        },
+                        channel: messageEvent.message.number
+                    }, (status, response) => {
+                        if (status.error) {
+                            // TODO add error event
+                        } else {
+                            // TODO add something if needed
+                        }
+                    });
+                    $('#myModalAcceptCall').modal('hide');
+                });
+                $('#requestCallAccept').click(() => {
+                    pubnubmain.publish({
+                        message: {
+                            type: 'callRequestAccept',
+                            id: pubnubmain.getUUID(),
+                            number: '{{ request.user.username }}'
+                        },
+                        channel: messageEvent.message.number
+                    }, (status, response) => {
+                        // TODO add something yet i don't know what to add
+                    });
+                });
+            } else if (messageEvent.message.type === 'callRequestDeny') {
+                // TODO add callDeny event
+                alert("Call Denied by " + messageEvent.message.number);
+                $('#myModalRequestCall').modal('hide');
+            } else if (messageEvent.message.type === 'callRequestAccept') {
+                $('#myModalRequestCall').modal('hide');
+                // TODO start initiating phone call
+            } else if (messageEvent.message.type === 'callRequestCancel') {
+                // TODO add callRequest cancel event
+            }
+        }
+    });
+    pubnubmain.subscribe({
+        channels: ['{{ request.user.username }}']
+    });
+    function requestCall(username) {
+        $('#myModalRequestCall').modal();
+        pubnubmain.publish({
+            message: {
+                type: 'callRequest',
+                id: pubnubmain.getUUID(),
+                number: '{{ request.user.username }}'
+            },
+            channel: username
+        }, (status, response) => {
+            if (status.error) {
+                alert("Cannot request for call to " + username);
+            }
+        })
+        // TODO wait for some time and auto cancel call request
+    }
 </script>
 {% endblock %}
 
@@ -64,14 +119,14 @@
             <tr>
             <td>{{ usr.username }}</td>
             <td>
-                <button type="button" class="ui inverted red button" id="myBtn" onclick="return showModal('{{ usr.username }}')">Call</button>
+                <button type="button" class="ui inverted red button" id="myBtn" onclick="return requestCall('{{ usr.username }}')">Call</button>
             </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
     </div>
-      <div class="modal" id="myModal">
+      <div class="modal" id="myModalVideoCall">
         <div class="modal-dialog">
           <div class="modal-content">
           
@@ -92,6 +147,55 @@
               <button type="button" class="btn btn-danger" data-dismiss="modal" id="callEnd">END</button>
             </div>
             
+          </div>
+        </div>
+      </div>
+    <div class="modal" id="myModalRequestCall">
+        <div class="modal-dialog">
+          <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title">In Call</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <!-- TODO add content on call request -->
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+
+              <button type="button" class="btn btn-danger" data-dismiss="modal" id="requestCallCancel">CANCEL</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    <div class="modal" id="myModalAcceptCall">
+        <div class="modal-dialog">
+          <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title">In Call</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+              <!-- TODO add deny content -->
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+
+              <button type="button" class="btn btn-danger" data-dismiss="modal" id="requestCallDeny">DENY</button>
+                <button type="button" id="requestCallAccept">ACCEPT</button>
+            </div>
+
           </div>
         </div>
       </div>
