@@ -10,69 +10,9 @@
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-    <script src="{% static 'home/js/pubnub.js' %}"></script>
-    <script src="{% static 'home/js/webrtc.js' %}"></script> {# webrtc version 2 #}
-    {% comment %}
-    <script>
-        var video_out = document.getElementById('vid-box');
-        var vid_thumb = document.getElementById('vid-thumb');
-        $(document).ready(function () {
-            var phone = window.phone = PHONE({
-                number: '{{ request.user.username }}' || 'Anonymous',
-                publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
-                subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda',
-            });
-            var ctrl = window.ctrl = CONTROLLER(phone);
-            ctrl.ready(function () {
-               ctrl.addLocalStream(vid_thumb);
-            });
-            ctrl.receive(function (session) {
-               session.connected(function (session) {
-                   video_out.appendChild(session.video);
-                   $('.fullscreen.modal').modal('show');
-               });
-                session.ended(function (session) {
-                    ctrl.getVideoElement(session.number).remove();
-                    $('.fullscreen.modal').modal('hide');
-                });
-            });
-            ctrl.videoToggled(function (session, isEnabled) {
-                ctrl.getVideoElement(session.number).toggle(isEnabled);
-            });
-            ctrl.audioToggled(function (session, isEnabled) {
-                ctrl.getVideoElement(session.number).css("opacity", isEnabled ? 1 : 0.75);
-            });
-        });
-        function showModal(username) {
-            $('.fullscreen.modal').modal('show');
-            $('.fullscreen.modal').modal({
-                closable: true
-            })
-            if (!window.phone) alert("Login First!");
-            if (phone.number() == username) return false;
-            ctrl.isOnline(username, function (isOn) {
-                if (isOn) ctrl.dial(username);
-                else alert('User is offline');
-            });
-        }
-
-        $('#endCall').click(function () {
-            ctrl.hangup();
-            $('.fullscreen.modal').modal('hide');
-        });
-        $('#muteCall').click(function () {
-            var audio = ctrl.toggleAudio();
-            if (!audio) $('#muteCall').html('Unmute');
-            else $('#muteCall').html('Mute');
-        });
-        $('#pauseCall').click(function () {
-            var video = ctrl.toggleVideo();
-	        if (!video) $('#pauseCall').html('Unpause');
-	        else $('#pauseCall').html('Pause');
-        })
-    </script>
-    {% endcomment %}
-    <script>
+<script src="{% static 'home/js/pubnub.js' %}"></script>
+<script src="{% static 'home/js/webrtc.js' %}"></script>
+<script>
     $(document).ready(() => {
         var phone = window.phone = PHONE({
             number: '{{ request.user.username }}' || 'Anonymous',
@@ -97,9 +37,7 @@
         $('#myModal').modal();
         var session = phone.dial(username);
     }
-
-
-    </script>
+</script>
 {% endblock %}
 
 {% block content %}

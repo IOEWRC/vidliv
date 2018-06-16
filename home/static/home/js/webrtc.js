@@ -7,11 +7,15 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 const PHONE = window.PHONE = config => {
     const PHONE         = ()=>{};
-    const pubnub        = socket(config);
+    const pubnub        = new PubNub({
+        subscribeKey: config.subscribe_key,
+        publishKey: config.publish_key,
+        ssl: config.ssl !== undefined ? config.ssl : true
+    });
     const pubkey        = config.publish_key   || 'demo';
     const subkey        = config.subscribe_key || 'demo';
     const autocam       = config.autocam !== false;
-    const sessionid     = uuid();
+    const sessionid     = pubnub.getUUID();
     const mediaconf     = config.media || { audio : true, video : true };
     const conversations = {};
     let   myvideo       = document.createElement('video');
@@ -45,7 +49,7 @@ const PHONE = window.PHONE = config => {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // Local Microphone and Camera Media (one per device)
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    navigator.getUserMedia =
+    navigator.getUserMedia = 
         navigator.getUserMedia       ||
         navigator.webkitGetUserMedia ||
         navigator.mozGetUserMedia    ||
@@ -155,7 +159,7 @@ const PHONE = window.PHONE = config => {
                 talk.pc.close();
                 close_conversation(number);
             };
-
+            
             // Stop Audio/Video Stream
             talk.stop = () => {
                 if (mystream) stopcamera();
@@ -220,7 +224,7 @@ const PHONE = window.PHONE = config => {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // UUID
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    PHONE.uuid = uuid;
+    PHONE.uuid = pubnub.getUUID;
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // DOM Helper Functions
@@ -368,7 +372,7 @@ const PHONE = window.PHONE = config => {
         // Video Settings
         video.width  = snap.width;
         video.height = snap.height;
-        video.srcObject  = stream;
+        video.srcObject = stream;
         video.volume = 0.0;
 
         // Start Video Stream
@@ -415,14 +419,34 @@ const PHONE = window.PHONE = config => {
     // Listen For New Incoming Calls
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     function dailer_subscribe() {
-        pubnub.subscribe({
-            restore    : false
-        ,   channel    : config.number
-        ,   message    : receive
-        ,   disconnect : disconnectcb
-        ,   reconnect  : reconnectcb
-        ,   connect    : () => onready(true)
-        });
+        pubnub.addListener({
+              status: function(statusEvent) {
+                  if (statusEvent.category === "PNConnectedCategory") {
+                      onready(true)
+                  } else if (statusEvent.category === "PNUnknownCategory") {
+                      var newState = {
+                          new: 'error'
+                      };
+                      pubnub.setState(
+                          {
+                              state: newState
+                          },
+                          function (status) {
+                              console.log(statusEvent.errorData.message)
+                          }
+                      );
+                  }
+              },
+              message: function(message) {
+                  console.log('Message received.');
+                  console.log(message);
+                  receive(message.message);
+              }
+          });
+
+          pubnub.subscribe({
+              channels: [config.number]
+          });
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -460,7 +484,7 @@ const PHONE = window.PHONE = config => {
         if (!mystream) return;
         for (let track of mystream.getTracks()) track.stop();
     }
-
+    
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // Initiate Dialing Socket
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -477,7 +501,16 @@ const PHONE = window.PHONE = config => {
         let number  = config.number;
         let message = { packet : packet, id : sessionid, number : number };
         debugcb(message);
-        pubnub.publish({ channel : phone, message : message });
+        pubnub.publish({
+            message: message,
+            channel: phone.toString()
+        }, function (status, response) {
+            if (status.error) {
+                console.log(status)
+            } else {
+                console.log("message Published w/ timetoken", response.timetoken)
+            }
+        });
 
         // Recurse if Requested for
         if (!times) return;
@@ -544,7 +577,7 @@ const PHONE = window.PHONE = config => {
         // Get Call Reference
         let talk = get_conversation(message.number);
         let pc   = talk.pc;
-        let type = message.packet.type == 'offer' ? 'offer' : 'answer';
+        let type = message.packet.type === 'offer' ? 'offer' : 'answer';
 
         // Deduplicate SDP Offerings/Answers
         if (type in talk) return;
@@ -561,7 +594,7 @@ const PHONE = window.PHONE = config => {
                 update_conversation( talk, 'connected' );
 
                 // Call Online and Ready
-                if (pc.remoteDescription.type != 'offer') return;
+                if (pc.remoteDescription.type !== 'offer') return;
 
                 // Create Answer to Call
                 pc.createAnswer( answer => {
@@ -610,220 +643,4 @@ const PHONE = window.PHONE = config => {
     // Return Phone API
     return PHONE;
 };
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// UUID
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function uuid(callback) {
-    let u = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
-    function(c) {
-        let r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-        return v.toString(16);
-    });
-    if (callback) callback(u);
-    return u;
-}
-
-
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// PubNub Socket Lib
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-function socket(setup) {
-    const pubkey = setup.publish_key   || setup.pubkey || 'demo'
-    ,     subkey = setup.subscribe_key || setup.subkey || 'demo';
-
-    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Publish
-    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    function publish(data) {
-        const publisher = requester({
-            timeout : 5000
-        ,   success : setup.status || (()=>{})
-        ,   fail    : setup.status || (()=>{})
-        });
-
-        let url = ['https://pubsub.pubnub.com/publish'
-                  , pubkey
-                  , subkey,       '0'
-                  , data.channel, '0'
-                  , encodeURIComponent(JSON.stringify(data.message))
-                  ].join('/');
-
-        publisher({ url : url });
-    }
-
-    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Subscribe
-    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    function subscribe(setup) {
-        let channel    = setup.channel       || 'a'
-        ,   message    = setup.message       || (()=>{})
-        ,   connect    = setup.connect       || (()=>{})
-        ,   disconnect = setup.disconnect    || (()=>{})
-        ,   reconnect  = setup.reconnect     || (()=>{})
-        ,   timetoken  = setup.timetoken     || '0'
-        ,   timeout    = setup.timeout       || 300000
-        ,   windy      = setup.windowing     || 10
-        ,   restore    = setup.restore
-        ,   windowing  = 10
-        ,   connected  = true
-        ,   stop       = false
-        ,   url        = ''
-        ,   origin     = 'ps'+(Math.random()+'').split('.')[1]+'.pubnub.com';
-
-        // Requester Object
-        let request = requester({
-            timeout : timeout,
-            success : next,
-            fail    : () => next()
-        });
-
-        // Subscribe Loop
-        function next(payload) {
-            if (stop) return;
-            if (payload) {
-                if (+timetoken < 100000) connect();
-                if (!connected)          reconnect();
-
-                connected = true;
-
-                if (!restore) timetoken = payload.t.t;
-                else {
-                    timetoken = '1000';
-                    restore   = false;
-                }
-
-                payload.m.forEach( msg => message( msg.d, msg ) );
-            }
-            else {
-                if (connected) disconnect();
-                connected = false;
-            }
-
-            url = [
-                'https://',       origin,
-                '/v2/subscribe/', subkey,
-                '/',              channel,
-                '/0/',            timetoken
-            ].join('');
-
-            setTimeout( () => {
-                windowing = windy;
-                request({ url : url });
-            }, windowing );
-        }
-
-        // Cancel Subscription
-        function unsubscribe() { stop = true }
-
-        // Start Subscribe Loop
-        next();
-
-        // Allow Cancelling Subscriptions
-        return { unsubscribe : unsubscribe };
-    }
-
-    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // History
-    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    function history(data) {
-        // TODO
-    }
-
-    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    // Request URL
-    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    function requester(setup) {
-        let xhr      = new XMLHttpRequest()
-        ,   finished = false
-        ,   timeout  = setup.timeout || 5000
-        ,   success  = setup.success || function(){}
-        ,   fail     = setup.fail    || function(){};
-
-        // Cancel a Pending Request
-        function abort() {
-            if (finished) return;
-            xhr.abort && xhr.abort();
-            finish();
-        }
-
-        // Mark Request as Completed
-        function finish() {
-            finished = true;
-        }
-
-        // When a Request has a Payload
-        xhr.onload = () => {
-            if (finished) return;
-            finish();
-            let result;
-
-            try      { result = JSON.parse(xhr.response) }
-            catch(e) { fail(xhr) }
-
-            if (result) success(result);
-            else        fail(xhr);
-            result = null;
-        };
-
-        // When a Request has Failed
-        xhr.onabort = xhr.ontimeout = xhr.onerror = () => {
-            if (finished) return;
-            finish();
-            fail(xhr);
-        };
-
-        // Timeout and Aboart for Slow Requests
-        xhr.timer = setTimeout( () => {
-            if (finished) return;
-            abort();
-            fail(xhr);
-        }, timeout );
-
-        // Return Requester Object
-        return setup => {
-            let url     = setup.url     || 'https://ps.pubnub.com/time/0'
-            ,   headers = setup.headers || {}
-            ,   method  = setup.method  || 'GET'
-            ,   payload = setup.payload || null
-            ,   params  = setup.params  || setup.data || {}
-            ,   data    = [];
-
-            // URL Parameters
-            for (let param in params)
-                data.push([ param, params[param] ].join('='));
-
-            // Start Request
-            finished = false;
-            xhr.timeout = timeout;
-            xhr.open(
-                method,
-                url + (data.length ? ('?' + data.join('&')) : ''),
-                true
-            );
-
-            // Headers
-            for (let header in headers)
-                xhr.setRequestHeader( header, headers[header] );
-
-            // Send Request
-            xhr.send(payload);
-
-            return {
-                xhr   : xhr,
-                abort : abort
-            }
-        };
-    }
-
-    // Return Socket Lib Instance
-    return {
-        publish   : publish
-    ,   subscribe : subscribe
-    ,   history   : history
-    };
-
-}
-
 })();
