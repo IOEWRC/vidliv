@@ -629,6 +629,7 @@ const PHONE = window.PHONE = config => {
     // Main - Setup Dialer Socket and Camera
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     PHONE.startcamera  = startcamera;
+    PHONE.stopcamera = stopcamera;
     PHONE.camera.start = startcamera;
     PHONE.camera.stop  = stopcamera;
     PHONE.camera.video = () => myvideo;

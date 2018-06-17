@@ -58,6 +58,7 @@
                     $('#myModalAcceptCall').modal('hide');
                 });
                 $('#requestCallAccept').click(() => {
+                    $('#myModalAcceptCall').modal('hide');
                     pubnubmain.publish({
                         message: {
                             type: 'callRequestAccept',
@@ -68,6 +69,32 @@
                     }, (status, response) => {
                         // TODO add something yet i don't know what to add
                     });
+                    var phone = window.phone = PHONE({
+                        number: '{{ request.user.username }}',
+                        publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
+                        subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda',
+                        ssl: true
+                    });
+
+                    phone.receive(session => {
+                        session.connected(session => {
+                            $('#myModalVideoCall').modal();
+                            document.getElementById('vid-box').appendChild(session.video);
+                        });
+                        session.ended(session => {
+                            document.getElementById('vid-box').innerHTML = '';
+                            $('#myModalVideoCall').modal('hide');
+                            phone.stopcamera();
+                            delete(phone);
+                        });
+                    });
+                    $('#callEnd').click(() => {
+                        if(!phone) return;
+                        phone.hangup();
+                        $('#myModalVideoCall').modal('hide');
+                        phone.stopcamera();
+                        delete(phone);
+                    });
                 });
             } else if (messageEvent.message.type === 'callRequestDeny') {
                 // TODO add callDeny event
@@ -76,6 +103,34 @@
             } else if (messageEvent.message.type === 'callRequestAccept') {
                 $('#myModalRequestCall').modal('hide');
                 // TODO start initiating phone call
+                var phone = window.phone = PHONE({
+                    number: '{{ request.user.username }}',
+                    publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
+                    subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda',
+                    ssl: true
+                });
+                phone.ready(() => {
+                    var session = phone.dial(messageEvent.message.number);
+                });
+                phone.receive(session => {
+                    session.connected(session => {
+                        $('#myModalVideoCall').modal();
+                        document.getElementById('vid-box').appendChild(session.video);
+                    });
+                    session.ended(session => {
+                        document.getElementById('vid-box').innerHTML = '';
+                        $('#myModalVideoCall').modal('hide');
+                        phone.stopcamera();
+                        delete(phone);
+                    });
+                });
+                $('#callEnd').click(() => {
+                   if(!phone) return;
+                   phone.hangup();
+                   phone.stopcamera();
+                   $('#myModalVideoCall').modal('hide');
+                   delete(phone);
+                });
             } else if (messageEvent.message.type === 'callRequestCancel') {
                 // TODO add callRequest cancel event
             }
