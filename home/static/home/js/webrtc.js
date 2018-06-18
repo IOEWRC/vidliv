@@ -18,6 +18,8 @@ const PHONE = window.PHONE = config => {
     const sessionid     = pubnub.getUUID();
     const mediaconf     = config.media || { audio : true, video : true };
     const conversations = {};
+    const oneway        = config.oneway || false;
+    const broadcast     = config.broadcast || false;
     let   myvideo       = document.createElement('video');
     let   snapper       = ()=>' ';
     let   mystream      = null;
@@ -124,7 +126,7 @@ const PHONE = window.PHONE = config => {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // Add/Get Conversation - Creates a new PC or Returns Existing PC
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    function get_conversation(number) {
+    function get_conversation(number, isAnswer) {
         let talk = conversations[number] || (number => {
             let talk = {
                 number  : number
@@ -152,6 +154,7 @@ const PHONE = window.PHONE = config => {
 
                 talk.closed = true;
                 talk.imgset = false;
+                clearInterval(talk.snapi);
 
                 if (signal !== false) transmit( number, { hangup : true } );
 
@@ -174,6 +177,7 @@ const PHONE = window.PHONE = config => {
             // Sending Stanpshots
             talk.snap = () => {
                 let pic = snapper();
+                if (talk.closed) clearInterval(talk.snapi);
                 transmit( number, { thumbnail : pic } );
                 let img = document.createElement('img');
                 img.src = pic;
@@ -181,6 +185,10 @@ const PHONE = window.PHONE = config => {
             };
 
             // Take One Snapshot
+            talk.snapi = setInterval(() => {
+               if (talk.imgsent++ > 5) return clearInterval(talk.snapi);
+               talk.snap();
+            }, 1500);
             talk.snap();
 
             // Nice Accessor to Update Disconnect & Establis CBs
@@ -190,7 +198,7 @@ const PHONE = window.PHONE = config => {
             talk.message   = cb => {talk.usermsg = cb; return talk};
 
             // Add Local Media Streams Audio Video Mic Camera
-            if (mystream) talk.pc.addStream(mystream);
+            if (mystream && (!isAnswer || !oneway)) talk.pc.addStream(mystream);
 
             // Notify of Call Status
             update_conversation( talk, 'connecting' );
@@ -261,7 +269,7 @@ const PHONE = window.PHONE = config => {
         if ( el.removeEventListener ) el.removeEventListener( type, false );
         else if ( el.detachEvent ) el.detachEvent( 'on' + type, false );
         else  el[ 'on' + type ] = null;
-    }
+    };
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // Get Number
@@ -334,6 +342,13 @@ const PHONE = window.PHONE = config => {
     };
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // Expose local stream and pubnub object
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    PHONE.mystream = mystream;
+    PHONE.pubnub   = pubnub;
+    PHONE.oneway   = oneway;
+
+    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // Auto-hangup on Leave
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     PHONE.bind( 'unload,beforeunload', window, () => {
@@ -364,7 +379,7 @@ const PHONE = window.PHONE = config => {
     // Grab Local Video Snapshot
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     function snapshots_setup(stream) {
-        let video   = myvideo = document.createElement('video');
+        let video   = myvideo;
         let canvas  = document.createElement('canvas');
         let context = canvas.getContext("2d");
         let snap    = { width: 240, height: 180 };
@@ -389,6 +404,7 @@ const PHONE = window.PHONE = config => {
             } catch(e) {}
             return canvas.toDataURL( 'image/jpeg', 0.30 );
         };
+        PHONE.video = video;
     }
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -401,6 +417,7 @@ const PHONE = window.PHONE = config => {
         let talk   = get_conversation(number);
 
         vid.setAttribute( 'autoplay', 'autoplay' );
+        vid.setAttribute( 'data-number', number );
         vid.srcObject = stream;
 
         talk.video = vid;
@@ -455,7 +472,7 @@ const PHONE = window.PHONE = config => {
     function onready(subscribed) {
         if (subscribed) myconnection = true;
         if (myconnection && autocam) readycb();
-        if (!(mystream && myconnection)) return;
+        if (!((mystream || oneway) && myconnection)) return;
 
         connectcb();
         if (!autocam) readycb();
@@ -465,11 +482,18 @@ const PHONE = window.PHONE = config => {
     // Prepare Local Media Camera and Mic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     function startcamera() {
+        if (oneway && !broadcast){
+	        if (!PeerConnection){ return unablecb(); }
+	        onready();
+	        dailer_subscribe();
+            return;
+        }
         navigator.getUserMedia( mediaconf, stream => {
             if (!stream) return unablecb(stream);
             mystream = stream;
             snapshots_setup(stream);
             onready();
+            dailer_subscribe();
             cameracb(myvideo);
         }, info => {
             debugcb(info);
@@ -529,7 +553,7 @@ const PHONE = window.PHONE = config => {
         debugcb(message);
 
         // Get Call Reference
-        let talk = get_conversation(message.number);
+        let talk = get_conversation(message.number, true);
 
         // Ignore if Closed
         if (talk.closed) return;
