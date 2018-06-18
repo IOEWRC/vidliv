@@ -1,4 +1,9 @@
--r production.txt
+-r base.txt
+
+#ddt
+django-debug-toolbar==1.9.1
+sqlparse==0.2.4
+
 #coverage
 coverage==4.5.1
 
