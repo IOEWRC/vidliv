@@ -7,33 +7,72 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="icon" href="{% static 'img/favicon.ico' %}">
+   
     <!-- Title here -->
     <title>{% block title %}vidliv{% endblock %}</title>
+    
     <!-- Css files link here -->
-    <link rel="stylesheet" href="{% static 'css/semantic.min.css' %}">
-   {%comment%} <link rel="stylesheet" href="{% static 'css/test_stylesheet.css' %}">{%endcomment%}
-    <!-- Fonts and icons -->
+    <link rel="stylesheet" href="{% static 'css/semantic.css' %}">
+   {# <link rel="stylesheet" href="{% static 'css/test_stylesheet.css' %}"> #}
+    
+   <!-- Fonts and icons -->
     <link href="https://fonts.googleapis.com/css?family=Oleo+Script+Swash+Caps" rel="stylesheet">
-    <link href=""
-
+  
     <!-- {# stylesheet for respective pages goes here #} -->
     {% block stylesheet %}{% endblock %}
+    <style>
+        body {
+          background:gainsboro;
+          
+        }
+        .ui.menu.main .header.item{
+          font-size: 25px;
+          font-family: 'Oleo Script Swash Caps', cursive;
+          padding: 0 auto !important;
+          color: rgb(89, 25, 128) ;
+        }
+        
+        .navitem{
+          font-size:15px;
+          padding: 0 !important;
+        }
+        .ui.menu.main .search.item {
+          flex-grow: 1;
+        }
+        .ui.search.input > input{
+          border-radius: 2rem !important;
+          color:black;
+
+        }
+        
+      </style>
 </head>
 <body>
-{% block navbar %} {% include 'navbar.html' %} {% endblock navbar %}
+{%block navbar%}{% include 'navbar.html' %} {%endblock navbar%}
+
 {# this block name must not be changed #}
 {% block content %}{% endblock %}
 
+<!-- footer segment -->
+
+
+<!-- script for semantic-ui -->
+<script type="text/javascript" src="{% static 'js/jquery-3.1.1.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/semantic.js' %}"></script>
+
 </body>
-<script type="text/javascript" src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/semantic.min.js' %}"></script>
+
 {# javascript goes here #}
 {% block script %}{% endblock %}
 <script>
     $(document)
     .ready(function() {
+      // fix main menu to page on passing
+      $('.main.menu').visibility({
+        type: 'fixed'
+      });
       // show dropdown on hover
-      $('.navmenu.menu  .ui.dropdown').dropdown({
+      $('.main.menu  .ui.dropdown').dropdown({
         on: 'hover'
       });
     });
