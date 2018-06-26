@@ -4,20 +4,23 @@
 {% block title %}{% trans "Log in" %}{% endblock %}
 
 {% block content %}
-<div class="ui middle aligned center aligned grid"> 
-    <form class="ui large form" method="post" action="">
+<div class="ui vertical center aligned grid">
+    <form class="ui large form" method="post" action="" novalidate>
         <div>
         {% csrf_token %}
-        {{ form.as_p }}
-        <input class="ui fluid large button positive" type="submit" value="{% trans 'Log in' %}" />
+            {% include 'form-template.html' %}
+        </div>
+        <br>
+            <div>
+        <input class="ui fluid large button teal" type="submit" value="{% trans 'Log in' %}" />
         <input type="hidden" name="next" value="{{ next }}" />
-    
-       <br> <p>{% trans "Forgot your password?" %} <a href="{% url 'auth_password_reset' %}"><br>{% trans "Reset it" %}</a>.</p>
+            </div>
+    <div>
+       <br>  <a href="{% url 'auth_password_reset' %}"><p style="color: teal">{% trans "Forgot your password?" %}</a>.</p>
         <!-- <p>{% trans "Not a member?" %} <a href="{% url 'registration_register' %}">{% trans "Register" %}</a>.</p> -->
         </div>
     </form>
 </div> 
-
 
 {% endblock %}
 

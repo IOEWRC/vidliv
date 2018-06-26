@@ -13,7 +13,7 @@
     
     <!-- Css files link here -->
     <link rel="stylesheet" href="{% static 'css/semantic.css' %}">
-   {# <link rel="stylesheet" href="{% static 'css/test_stylesheet.css' %}"> #}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
     
    <!-- Fonts and icons -->
     <link href="https://fonts.googleapis.com/css?family=Oleo+Script+Swash+Caps" rel="stylesheet">
@@ -21,45 +21,22 @@
     <!-- {# stylesheet for respective pages goes here #} -->
 
     {% block stylesheet %}{% endblock %}
-    <style>
-        body {
-          background:gainsboro;
-          
-        }
-        .ui.menu.main .header.item{
-          font-size: 25px;
-          font-family: 'Oleo Script Swash Caps', cursive;
-          padding: 0 auto !important;
-          color: rgb(89, 25, 128) ;
-        }
-        
-        .navitem{
-          font-size:15px;
-          padding: 0 !important;
-        }
-        .ui.menu.main .search.item {
-          flex-grow: 1;
-        }
-        .ui.search.input > input{
-          border-radius: 2rem !important;
-          color:black;
-
-        }
-        
-      </style>
 </head>
 <body>
 {%block navbar%}{% include 'navbar.html' %} {%endblock navbar%}
 
 {# this block name must not be changed #}
 {% block content %}{% endblock %}
-
+<div id="particles"></div>
+<br>
+<div id="particles"></div>
 <!-- footer segment -->
 
 
 <!-- script for semantic-ui -->
 <script type="text/javascript" src="{% static 'js/jquery-3.1.1.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/semantic.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/particles.js' %}"></script>
 
 </body>
 

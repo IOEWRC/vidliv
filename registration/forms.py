@@ -34,10 +34,25 @@ class RegistrationForm(UserCreationForm):
     """
     required_css_class = 'required'
     email = forms.EmailField(label=_("E-mail"))
+    username = forms.CharField(
+        label="Username",
+    )
+    password1 = forms.CharField(
+        label="Password",
+        strip=False,
+        widget=forms.PasswordInput,
+    )
+    password2 = forms.CharField(
+        label="Re-enter Password",
+        strip=False,
+        widget=forms.PasswordInput
+    )
+    first_name = forms.CharField(max_length=30, required=True)
+    last_name = forms.CharField(max_length=30, required=True)
 
     class Meta:
         model = User
-        fields = (UsernameField(), "email")
+        fields = (UsernameField(), "email", 'first_name', 'last_name', )
 
 
 class RegistrationFormUsernameLowercase(RegistrationForm):
@@ -128,3 +143,9 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['location', 'avatar', 'phone_number', 'gender', 'about_me']
+
+class CustomRegistrationForm(
+    RegistrationFormUniqueEmail,
+    RegistrationFormUsernameLowercase
+):
+    pass

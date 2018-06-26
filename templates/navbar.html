@@ -27,7 +27,7 @@
 
         {% if user.is_authenticated %}
         <div class="ui right item">
-          <a href="#" > <i class="user circle outline link icon"></i>{{ request.user.username }}
+          <a href="{% url 'user_profile' %}" > <i class="user circle outline link icon"></i>{{ request.user.username }}
           </a>
         </div>
         <div class=" ui dropdown item"><i class="settings icon"></i>
@@ -35,7 +35,7 @@
           <div class="menu">
             <a class="item" href="{%url 'auth_password_change' %}"> 
               <i class="edit outline icon"></i>Change Password</a>
-            <a class="item" href="{%url 'edit_profile'}">
+            <a class="item" href="{%url 'edit_profile' %}">
                 <i class="edit icon"></i>Edit Profile</a>
             <a class="item" href="{%url 'auth_logout' %}">
                 <i class="sign out alternate icon"></i>Log Out</a>

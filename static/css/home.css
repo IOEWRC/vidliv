@@ -3,3 +3,39 @@ Write your own css here */
 body{
     background:gainsboro;   
 }
+.invalid-feedback{
+    color: red;
+}
+.prof label{
+    color: teal;
+}
+.ui.menu.main .header.item{
+  font-size: 25px;
+  font-family: 'Oleo Script Swash Caps', cursive;
+  padding: 0 auto !important;
+  color: rgb(89, 25, 128) ;
+}
+
+.navitem{
+  font-size:15px;
+  padding: 0 !important;
+}
+.ui.menu.main .search.item {
+  flex-grow: 1;
+}
+.ui.search.input > input{
+  border-radius: 2rem !important;
+  color:black;
+
+}
+#particles {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    z-index: -2;
+}

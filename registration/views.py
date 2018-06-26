@@ -13,11 +13,11 @@ from django.views.generic.edit import FormView
 
 from registration.forms import ResendActivationForm
 from django.contrib.auth.models import User
-from .forms import UserForm, ProfileForm
+from .forms import UserForm, ProfileForm, CustomRegistrationForm
 
 REGISTRATION_FORM_PATH = getattr(settings, 'REGISTRATION_FORM',
                                  'registration.forms.RegistrationForm')
-REGISTRATION_FORM = import_string(REGISTRATION_FORM_PATH)
+REGISTRATION_FORM = CustomRegistrationForm
 ACCOUNT_AUTHENTICATED_REGISTRATION_REDIRECTS = getattr(
     settings, 'ACCOUNT_AUTHENTICATED_REGISTRATION_REDIRECTS', True)
 
