@@ -25,6 +25,11 @@ from django.utils.translation import ugettext_lazy as _
 from .users import UserModel
 from .users import UserModelString
 
+from django.dispatch import receiver
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.core.validators import RegexValidator
+
 logger = logging.getLogger(__name__)
 SHA1_RE = re.compile('^[a-f0-9]{40}$')
 
@@ -691,3 +696,26 @@ class SupervisedRegistrationProfile(RegistrationProfile):
             admin_approve_complete_email_body,
             admin_approve_complete_email_html
         )
+
+
+class UserProfile(models.Model):
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female')
+    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    location = models.CharField(max_length=100)
+    avatar = models.ImageField(upload_to='profle_images', blank=True)
+    phone_regex = RegexValidator(regex=r'^\d{8,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    phone_number = models.CharField(validators=[phone_regex], max_length=16, blank=True)
+    about_me = models.TextField(blank=True)
+    gender = models.CharField(max_length=6, choices=GENDER_CHOICES, default='Male')
+
+    def __str__(self):
+        return self.user.username
+
+
+@receiver(post_save, sender=User)
+def create_profile(sender, **kwargs):
+    if kwargs['created']:
+        user_profile = UserProfile.objects.create(user=kwargs['instance'])

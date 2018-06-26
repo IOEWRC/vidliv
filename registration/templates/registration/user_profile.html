@@ -1,0 +1,41 @@
+<!-- this is the markup. you can change the details (your own name, your own avatar etc.) but don’t change the basic structure! -->
+{% extends "registration/registration_base.html" %}
+{% load static %}
+{% block title %}{{ user.username }}'s profile{% endblock %}
+{% block stylesheet %}
+    <link rel="stylesheet" href="{% static 'registration/css/user_profile.css' %}">
+{% endblock %}
+{% block content %}
+    <div class="ui container main">
+    <div class="destacados ui two column centered grid">
+            <div class="box1">
+                {% if not user.profile.avatar %}
+                    <img src="https://www.atomix.com.au/media/2015/06/atomix_user31.png" class="img-circle img-thumbnail">
+                {% else %}
+                    <img src="{{ user.profile.avatar.url }}" class="img-circle img-thumbnail" style="width: 150px;height: 150px">
+                     <br /> <br />
+                {% endif %}
+
+              <h3>{{ user.get_full_name }}</h3>
+            <h4 style="color:#A9ABA6">Username: {{ user.username }}</h4>
+            <h4 style="color:#A9ABA6">Location: {{ user.profile.location }}</h4>
+            <h4 style="color:#A9ABA6">Phone No.: {{ user.profile.phone_number }}</h4>
+            <h4 style="color:#A9ABA6">Gender: {{ user.profile.get_gender_display }}</h4>
+            <h4 style="color:#A9ABA6">About Me: {{ user.profile.about_me }}</h4>
+            <hr>
+            <button class="button" href="#"><span>Call </span></button>
+                <br><hr>
+            </div>
+    </div>
+
+</div>
+
+<div id="particles"></div>
+
+{% endblock %}
+{% block script %}
+    <script src="{% static 'registration/js/user_profile.js' %}"></script>
+{% endblock %}
+
+<div id="particles"></div>
+
