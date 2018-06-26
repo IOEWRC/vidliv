@@ -4,7 +4,7 @@ Views which allow users to create and activate accounts.
 """
 
 from django.conf import settings
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.module_loading import import_string
 from django.views.decorators.debug import sensitive_post_parameters
@@ -12,10 +12,12 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
 from registration.forms import ResendActivationForm
+from django.contrib.auth.models import User
+from .forms import UserForm, ProfileForm, CustomRegistrationForm
 
 REGISTRATION_FORM_PATH = getattr(settings, 'REGISTRATION_FORM',
                                  'registration.forms.RegistrationForm')
-REGISTRATION_FORM = import_string(REGISTRATION_FORM_PATH)
+REGISTRATION_FORM = CustomRegistrationForm
 ACCOUNT_AUTHENTICATED_REGISTRATION_REDIRECTS = getattr(
     settings, 'ACCOUNT_AUTHENTICATED_REGISTRATION_REDIRECTS', True)
 
@@ -176,3 +178,28 @@ class ApprovalView(TemplateView):
 
     def get_success_url(self, user):
         raise NotImplementedError
+
+
+def view_profile(request, pk=None):
+    if pk:
+        user = get_object_or_404(User, pk=pk)
+    else:
+        user = request.user
+    return render(request, 'registration/user_profile.html', {'user': user})
+
+
+def edit_profile(request):
+    if request.method == "POST":
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            return redirect('user_profile')
+    else:
+        user_form = UserForm(instance=request.user)
+        profile_form = ProfileForm(instance=request.user.profile)
+    return render(request, 'registration/edit_profile.html', {
+        'user_form': user_form,
+        'profile_form': profile_form
+    })

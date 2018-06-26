@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from .models import RegistrationProfile
 from .users import UsernameField
+from registration.models import UserProfile
 
 
 class RegistrationAdmin(admin.ModelAdmin):
@@ -45,3 +46,5 @@ class RegistrationAdmin(admin.ModelAdmin):
 
 
 admin.site.register(RegistrationProfile, RegistrationAdmin)
+admin.site.register(UserProfile)
+

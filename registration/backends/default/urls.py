@@ -25,6 +25,7 @@ from django.views.generic.base import TemplateView
 from .views import ActivationView
 from .views import RegistrationView
 from .views import ResendActivationView
+from registration.views import view_profile, edit_profile
 
 urlpatterns = [
     url(r'^activate/complete/$',
@@ -46,6 +47,8 @@ urlpatterns = [
     url(r'^register/closed/$',
         TemplateView.as_view(template_name='registration/registration_closed.html'),
         name='registration_disallowed'),
+    url(r'^profile', view_profile, name='user_profile'),
+    url(r'^edit-profile', edit_profile, name='edit_profile'),
 ]
 
 if getattr(settings, 'INCLUDE_REGISTER_URL', True):

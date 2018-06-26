@@ -1,0 +1,34 @@
+<!-- this is the markup. you can change the details (your own name, your own avatar etc.) but don’t change the basic structure! -->
+{% extends "registration/registration_base.html" %}
+{% load static %}
+{% block title %}{{ user.username }}'s profile{% endblock %}
+{% block stylesheet %}
+    <link rel="stylesheet" href="{% static 'registration/css/user_profile.css' %}">
+{% endblock %}
+{% block content %}
+    <div class="ui container main">
+    <div class="destacados ui two column centered grid">
+            <div class="box1">
+                {% if not user.profile.avatar %}
+                    <img src="{% static 'img/matthew.png' %}" class="ui small circular image centered">
+                {% else %}
+                    <img src="{{ user.profile.avatar.url }}" class="ui small circular image centered" style="width: 100px;height: 100px">
+                     <br /> <br />
+                {% endif %}
+
+              <h3>{{ user.get_full_name }}</h3>
+            <h4 style="color:teal">Username: {{ user.username }}</h4>
+            <h4 style="color:teal">Location: {{ user.profile.location }}</h4>
+            <h4 style="color:teal">Phone No.: {{ user.profile.phone_number }}</h4>
+            <h4 style="color:teal">Gender: {{ user.profile.get_gender_display }}</h4>
+            <h4 style="color:teal">About Me: {{ user.profile.about_me }}</h4>
+            <hr>
+            <button class="ui button teal" href="#"><span>Call </span></button>
+                <button class="ui button teal" href="{% url 'edit_profile' %}" ><span>Update Profile</span></button>
+                <br><hr>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
