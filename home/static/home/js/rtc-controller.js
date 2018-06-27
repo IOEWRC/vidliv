@@ -11,7 +11,7 @@
 (function(){
 	
 	
-var CONTROLLER = window.CONTROLLER = function(phone){
+var CONTROLLER = window.CONTROLLER = function(phone, serverFunc){
 	if (!window.phone) window.phone = phone;
 	var ctrlChan  = controlChannel(phone.number());
 	var pubnub    = phone.pubnub;
@@ -68,18 +68,14 @@ var CONTROLLER = window.CONTROLLER = function(phone){
 	var stream_name = "";
 	
 	
-	CONTROLLER.streamPresence = function(cb){ streamprescb    = cb; };
-	CONTROLLER.streamReceive  = function(cb){ streamreceivecb = cb; };
+	CONTROLLER.streamPresence = function(cb){ streamprescb    = cb; }
+	CONTROLLER.streamReceive  = function(cb){ streamreceivecb = cb; }
 	
 	function broadcast(vid){
 	    var video = document.createElement('video');
-        video.srcObject    = phone.mystream;
+        video.src    = URL.createObjectURL(phone.mystream);
         video.volume = 0.0;
-        try {
-        	video.play();
-        } catch (e) {
-			//
-        }
+        video.play();
 	    video.setAttribute( 'autoplay', 'autoplay' );
 	    video.setAttribute( 'data-number', phone.number() );
 	    vid.style.cssText ="-moz-transform: scale(-1, 1); \
@@ -90,52 +86,29 @@ var CONTROLLER = window.CONTROLLER = function(phone){
     
     function stream_subscribe(name){
 	    var ch = (name ? name : phone.number()) + "-stream";
-	    pubnub.addListener({
-            status: statusEvent => {
-                if (statusEvent.category === 'PNConnectedCategory') {
-                    stream_name = ch;
-                    console.log("Streaming channel " + ch);
-                } else if (statusEvent.category === "PNUnknownCategory") {
-                    var newState = {
-                        new: 'error'
-                    };
-                    pubnub.setState(
-                        {
-                            state: newState
-                        },
-                        function (status) {
-                            console.log(statusEvent.errorData.message);
-                        }
-                    );
-                }
-            },
-            message: messageEvent => {
-                streamreceivecb(messageEvent);
-            },
-            presence: presenceEvent => {
-                streamprescb(presenceEvent);
-            }
-        });
 	    pubnub.subscribe({
-            channels    : [ch],
+            channel    : ch,
+            message    : streamreceivecb,
+            presence   : streamprescb,
+            connect    : function() { stream_name = ch; console.log("Streaming channel " + ch); }
         });
     }
     
     CONTROLLER.stream = function(){
 	    stream_subscribe();
-    };
+    }
     
     CONTROLLER.joinStream = function(name){
 	    stream_subscribe(name);
 	    publishCtrl(controlChannel(name), "userJoin", phone.number());
-    };
+    }
     
     CONTROLLER.leaveStream = function(name){
 	    var ch = (name ? name : phone.number()) + "-stream";
 	    pubnub.unsubscribe({
-            channels    : [ch],
+            channel    : ch,
         });
-    };
+    }
     
     CONTROLLER.send = function( message, number ) {
         if (phone.oneway) return stream_message(message);
@@ -144,15 +117,11 @@ var CONTROLLER = window.CONTROLLER = function(phone){
     
     function stream_message(message){
 	    if (!stream_name) return; // Not in a stream
-        pubnub.publish({
-            message: message,
-            channel: stream_name
-        }, (status, response) => {
-            if (status.error) {
-                //
-            }
-            //
-        });
+		pubnub.publish({ 
+			channel: stream_name,
+			message: msg,
+			callback : function(m){console.log(m)}
+		});
     }
     
     
@@ -162,6 +131,7 @@ var CONTROLLER = window.CONTROLLER = function(phone){
     };
 	
 	CONTROLLER.dial = function(number, servers){ // Authenticate here??
+		if (!servers && serverFunc) servers=serverFunc();
 		var session = phone.dial(number, servers); // Dial Number
 		if (!session) return; // No Duplicate Dialing Allowed
 	};
@@ -203,15 +173,13 @@ var CONTROLLER = window.CONTROLLER = function(phone){
 	};
 	
 	CONTROLLER.isOnline = function(number, cb){
-		pubnub.hereNow({
-            channels: [number],
-        }, (status, response) => {
-		    if (status.error) {
-		        console.log("Error in presence");
-            } else {
-		        cb(response.totalOccupancy !== 0);
-            }
-        });
+		pubnub.here_now({
+			channel : number,
+			callback : function(m){
+				console.log(m);  // TODO Comment out
+				cb(m.occupancy != 0);
+			}
+		});
 	};
 	
 	CONTROLLER.isStreaming = function(number, cb){
@@ -223,12 +191,12 @@ var CONTROLLER = window.CONTROLLER = function(phone){
 	}
 	
 	function manage_users(session){
-		if (session.number === phone.number()) return; 	// Do nothing if it is self.
+		if (session.number == phone.number()) return; 	// Do nothing if it is self.
 		var idx = findWithAttr(userArray, "number", session.number); // Find session by number
 		if (session.closed){
-			if (idx !== -1) userArray.splice(idx, 1)[0]; // User leaving
+			if (idx != -1) userArray.splice(idx, 1)[0]; // User leaving
 		} else {  				// New User added to stream/group
-			if (idx === -1) {  	// Tell everyone in array of new user first, then add to array.
+			if (idx == -1) {  	// Tell everyone in array of new user first, then add to array. 
 				if (!phone.oneway) publishCtrlAll("userJoin", session.number);
 				userArray.push(session);
 			}
@@ -238,11 +206,12 @@ var CONTROLLER = window.CONTROLLER = function(phone){
 	}
 	
 	function add_to_stream(number){
-		phone.dial(number);
+		if (serverFunc) phone.dial(number, serverFunc());
+		else phone.dial(number);
 	}
 	
 	function add_to_group(number){
-		var session = phone.dial(number, get_xirsys_servers()); // Dial Number
+		var session = serverFunc ? phone.dial(number, serverFunc()) : phone.dial(number); // Dial Number
 		if (!session) return; 	// No Dupelicate Dialing Allowed
 	}
 	
@@ -256,25 +225,18 @@ var CONTROLLER = window.CONTROLLER = function(phone){
 	function publishCtrl(ch, type, data){
 		// console.log("Pub to " + ch);
 		var msg = {type: type, data: data};
-		pubnub.publish({
-            channel: ch,
-            message: msg
-        }, (status, response) => {
-		    //
+		pubnub.publish({ 
+			channel: ch,
+			message: msg,
+			callback : function(m){console.log(m)}
 		});
 	}
 	
 	function subscribe(){
-	    pubnub.addListener({
-            status: statusEvent => {
-                //
-            },
-            message: messageEvent => {
-                receive(messageEvent.message)
-            }
-        });
 		pubnub.subscribe({
-            channels    : [ctrlChan],
+            channel    : ctrlChan,
+            message    : receive,
+            connect    : function() {} // console.log("Subscribed to " + ctrlChan); }
         });
 	}
 	
@@ -318,26 +280,3 @@ var CONTROLLER = window.CONTROLLER = function(phone){
 }
 
 })();
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// Request fresh TURN servers from XirSys - Need to explain.
-// room=default&application=default&domain=kevingleason.me&ident=gleasonk&secret=b9066b5e-1f75-11e5-866a-c400956a1e19
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-function get_xirsys_servers() {
-    var servers;
-    $.ajax({
-        url: "https://global.xirsys.net/_turn/pubnubClone/",
-        type: "PUT",
-        async: false,
-        headers: {
-            "Authorization": "Basic " + btoa("sagarspkt:7f7426ee-641c-11e8-b8af-f00c404ee570")
-        },
-        success: function(res) {
-            console.log(res);
-            res = JSON.parse(res);
-            if (!res.e) servers = res.d.iceServers;
-        },
-        async: false
-    });
-    return servers;
-}
