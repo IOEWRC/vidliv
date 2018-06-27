@@ -3,13 +3,22 @@
 
 {% block title %}{% trans "Register for an account" %}{% endblock %}
 
+
 {% block content %}
-<form method="post" action="">
+
+<div class="ui middle aligned center aligned grid">
+
+  
+<form class="ui large form" method="post" action="" novalidate>
     {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="{% trans 'Submit' %}" />
+    {% include 'form-template.html' %}
+    <input class="ui fluid large button teal" type="submit" value="{% trans 'Submit' %}" />
 </form>
+
+
+</div>
 {% endblock %}
+
 
 
 {% comment %}

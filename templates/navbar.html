@@ -1,0 +1,50 @@
+{%load static %}  
+  <div class="ui secondary inverted teal stackable menu main">
+    <div class="ui container">
+        <a href="{%url 'landing_page'%}" class="header item">
+          <!-- <img class="logo" src="{% static 'img/logo.png'%}"> -->
+          Vidliv
+        </a>
+        <div class="item">
+        <a href="{%url 'landing_page'%}" class="ui item navitem "><i class="home link icon"></i>Home</a>
+        </div>
+        {% if user.is_authenticated %}
+        <div class="ui right item">
+            <div class="ui search icon input">
+              <input placeholder="Search users..." type="text">
+              <i class="search link icon"></i>
+            </div>
+        </div>
+        {% endif %}
+  
+        <div class="ui right item ">
+            {% if not user.is_authenticated %}
+              
+          <div><a href="{%url 'registration_register'%}" class="item"><i class="users link icon"></i>Signup</a></div>
+          <div><a href="{% url 'auth_login' %}" class="item"><i class="user circle link icon"></i>Login</a></div>
+
+          {% endif %}
+
+        {% if user.is_authenticated %}
+        <div class="ui right item">
+          <a href="{% url 'user_profile' %}" > <i class="user circle outline link icon"></i>{{ request.user.username }}
+          </a>
+        </div>
+        <div class=" ui dropdown item"><i class="settings icon"></i>
+          Settings
+          <div class="menu">
+            <a class="item" href="{%url 'auth_password_change' %}"> 
+              <i class="edit outline icon"></i>Change Password</a>
+            <a class="item" href="{%url 'edit_profile' %}">
+                <i class="edit icon"></i>Edit Profile</a>
+            <a class="item" href="{%url 'auth_logout' %}">
+                <i class="sign out alternate icon"></i>Log Out</a>
+            <div class="divider"></div>
+            <div class="header">Rowdy</div>
+          </div>
+          </div>
+          {%endif%}
+        </div>
+    </div>
+    </div>
+    

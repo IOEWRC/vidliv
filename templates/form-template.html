@@ -11,24 +11,24 @@
   {{error_message}}
 {% endif %}
 {% for field in form %}
-    <div class="form-group">
+    <div class="ui form prof">
         {{ field.label_tag }}
         {% if field|is_file_field %}
             {{ field }}
         {% else %}
             {% if form.is_bound %}
                 {% if field.errors %}
-                    {% render_field field class="form-control is-invalid" %}
+                    {% render_field field class="" %}
                     {% for error in field.errors %}
                         <div class="invalid-feedback">
                             {{ error }}
                         </div>
                     {% endfor %}
                 {% else %}
-                    {% render_field field class="form-control is-valid" %}
+                    {% render_field field class="" %}
                 {% endif %}
             {% else %}
-                {% render_field field class="form-control" %}
+                {% render_field field class="" %}
             {% endif %}
             {% if field.help_text %}
                 <small class="form-text">

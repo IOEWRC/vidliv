@@ -2,21 +2,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Standard Meta -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="icon" href="{% static 'img/favicon.ico' %}">
+
+    <!-- Title here -->
     <title>{% block title %}vidliv{% endblock %}</title>
-    {# stylesheet for respective pages goes here #}
-    {% comment %} <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> {% endcomment %}
-    {% comment %} <link rel="stylesheet" href="{% static 'css/semantic.min.css' %}"/> {% endcomment %}
-    <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
-    {% comment %} <script src="{% static 'js/semantic.min.js'%}"></script> {% endcomment %}
-    {% comment %} <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> {% endcomment %}
+
+    <!-- Css files link here -->
+    <link rel="stylesheet" href="{% static 'css/semantic.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+
+   <!-- Fonts and icons -->
+    <link href="https://fonts.googleapis.com/css?family=Oleo+Script+Swash+Caps" rel="stylesheet">
+
+    <!-- {# stylesheet for respective pages goes here #} -->
+
     {% block stylesheet %}{% endblock %}
 </head>
 <body>
+{%block navbar%}{% include 'navbar.html' %} {%endblock navbar%}
+
 {# this block name must not be changed #}
 {% block content %}{% endblock %}
-{# javascript goes herer #}
-{% block script %}{% endblock %}
+<div id="particles"></div>
+<br>
+<div id="particles"></div>
+<!-- footer segment -->
+
+
+<!-- script for semantic-ui -->
+<script type="text/javascript" src="{% static 'js/jquery-3.1.1.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/semantic.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/particles.js' %}"></script>
+
 </body>
+
+{# javascript goes here #}
+{% block script %}{% endblock %}
+<script>
+    $(document)
+    .ready(function() {
+      // fix main menu to page on passing
+      $('.main.menu').visibility({
+        type: 'fixed'
+      });
+      // show dropdown on hover
+      $('.main.menu  .ui.dropdown').dropdown({
+        on: 'hover'
+      });
+    });
+</script>
 </html>
