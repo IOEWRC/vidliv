@@ -134,7 +134,7 @@ REGISTRATION_AUTO_LOGIN = True  # Automatically log the user in.
 
 LOGIN_REDIRECT_URL = 'home:home'  # TODO login redirect url to be final home url
 LOGIN_URL = 'auth_login'
-LOGOUT_URL = 'auth_logout'
+LOGOUT_URL = 'landing_page'
 
 
 # no login required views goes here

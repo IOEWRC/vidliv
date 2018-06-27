@@ -27,6 +27,7 @@
 
 {# this block name must not be changed #}
 {% block content %}{% endblock %}
+
 <div id="particles"></div>
 <br>
 <div id="particles"></div>
@@ -37,8 +38,6 @@
 <script type="text/javascript" src="{% static 'js/jquery-3.1.1.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/semantic.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/particles.js' %}"></script>
-
-</body>
 
 {# javascript goes here #}
 {% block script %}{% endblock %}
@@ -55,4 +54,5 @@
       });
     });
 </script>
+</body>
 </html>
