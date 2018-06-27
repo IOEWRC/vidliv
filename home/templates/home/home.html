@@ -17,7 +17,9 @@
         const ctrl = window.ctrl = CONTROLLER(phone);
         ctrl.receive(session => {
             session.connected(session => {
-                $('#videoCallModal').modal('show');
+                $('#videoCallModal').modal({
+                    closable: false
+                }).modal('show');
                 ctrl.addLocalStream(vid_thumb);
                 video_out.appendChild(session.video);
             });
@@ -33,38 +35,40 @@
         ctrl.audioToggled((session, isEnabled)=> {
             ctrl.getVideoElement(session.number).css('opacity', isEnabled ? 1: 0.75);
         });
-        function makeCall(username) {
+        function startCall(username) {
             if (!window.phone) alert("Currently not working.");
             if (phone.number() === username) return false;
             ctrl.isOnline(username, isOn => {
                 if (isOn) {
-                    $('#videoCallModal').modal('show');
+                    $('#videoCallModal').modal({
+                        closable: false
+                    }).modal('show');
                     ctrl.dial(username);
                 }
                 else alert(username + ' is offline');
             });
         }
-        $('#endCall').click(() => {
+        $('#endCallButton').click(() => {
             if (phone) ctrl.hangup();
         });
-        $('#muteCall').click(() => {
+        $('#muteCallButton').click(() => {
             if (ctrl) {
                 const audio = ctrl.toggleAudio();
-                if (!audio) $('#muteCall').html('' +
+                if (!audio) $('#muteCallButton').html('' +
                     '<i class="unmute icon"></i>\n' +
                     'Unmute');
-                else $('#muteCall').html('' +
+                else $('#muteCallButton').html('' +
                     '<i class="mute icon"></i>\n' +
                     'Mute');
             }
         });
-        $('#pauseCall').click(() => {
+        $('#pauseCallButton').click(() => {
             if (ctrl) {
                 const video = ctrl.toggleVideo();
-                if (!video) $('#pauseCall').html('' +
+                if (!video) $('#pauseCallButton').html('' +
                     '<i class="play icon"></i>\n' +
                     'Play');
-                else $('#pauseCall').html('' +
+                else $('#pauseCallButton').html('' +
                     '<i class="pause icon"></i>\n' +
                     'Pause');
             }
@@ -88,7 +92,7 @@
             <tr>
             <td>{{ usr.username }}</td>
             <td>
-                <button type="button" class="ui inverted teal button" id="myBtn" onclick="return makeCall('{{ usr.username }}')">Call</button>
+                <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
             </td>
             </tr>
         {% endfor %}

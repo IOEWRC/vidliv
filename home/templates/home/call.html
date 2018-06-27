@@ -1,6 +1,7 @@
 <div class="ui basic modal" id="videoCallModal">
     <div class="ui icon header">
         <i class="video icon"></i>
+        VidLiv Call
     </div>
     <div class="content">
         <div class="ui two column grid">
@@ -11,7 +12,7 @@
         </div>
     </div>
     <div class="actions">
-        <div class="ui inverted red button" id="endCall">
+        <div class="ui inverted red button" id="endCallButton">
             <i class="phone icon"></i>
             End
         </div>
@@ -23,5 +24,52 @@
             <i class="pause icon"></i>
             Pause
         </button>
+    </div>
+</div>
+<div class="ui mini modal" id="acceptCallModal">
+    <div class="ui icon header">
+        <i class="video icon"></i>
+        VidLiv Call Requested
+    </div>
+    <div class="content">
+        <p>Do you want to accept the call?</p>
+    </div>
+    <div class="actions">
+        <div class="ui approve teal button" id="acceptCallButton">
+            <i class="phone icon"></i>
+            Accept
+        </div>
+        <div class="ui cancel red button" id="denyCallButton">
+            <i class="phone square icon"></i>
+            Deny
+        </div>
+    </div>
+</div>
+<div class="ui mini modal" id="requestCallModal">
+    <div class="ui icon header">
+        <i class="video icon"></i>
+        VidLiv Call Requesting
+    </div>
+    <div class="content">
+        <p>VidLiv is requesting call for you to...</p>
+    </div>
+    <div class="actions">
+        <div class="ui cancel red button" id="requestCallCancelButton">
+            <i class="phone square icon"></i>
+            Cancel
+        </div>
+    </div>
+</div>
+<div class="ui mini modal" id="userNotAvailModal">
+    <div class="ui icon header">
+        <i class="video icon"></i>
+        VidLiv user not available
+    </div>
+    <div class="content">
+        <p>Sorry the user is not currently available.</p>
+    </div>
+    <div class="ui cancel teal button" id="userNotAvailOkButton">
+        <i class="unlink icon"></i>
+        Ok
     </div>
 </div>
