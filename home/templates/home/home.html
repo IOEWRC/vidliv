@@ -27,6 +27,12 @@
                 $('#videoCallModal').modal('hide');
             })
         });
+        ctrl.videoToggled((session, isEnabled) => {
+            ctrl.getVideoElement(session.number).toggle(isEnabled);
+        });
+        ctrl.audioToggled((session, isEnabled)=> {
+            ctrl.getVideoElement(session.number).css('opacity', isEnabled ? 1: 0.75);
+        });
         function makeCall(username) {
             if (!window.phone) alert("Currently not working.");
             if (phone.number() === username) return false;
@@ -40,6 +46,28 @@
         }
         $('#endCall').click(() => {
             if (phone) ctrl.hangup();
+        });
+        $('#muteCall').click(() => {
+            if (ctrl) {
+                const audio = ctrl.toggleAudio();
+                if (!audio) $('#muteCall').html('' +
+                    '<i class="unmute icon"></i>\n' +
+                    'Unmute');
+                else $('#muteCall').html('' +
+                    '<i class="mute icon"></i>\n' +
+                    'Mute');
+            }
+        });
+        $('#pauseCall').click(() => {
+            if (ctrl) {
+                const video = ctrl.toggleVideo();
+                if (!video) $('#pauseCall').html('' +
+                    '<i class="play icon"></i>\n' +
+                    'Play');
+                else $('#pauseCall').html('' +
+                    '<i class="pause icon"></i>\n' +
+                    'Pause');
+            }
         });
     </script>
 {% endblock %}
