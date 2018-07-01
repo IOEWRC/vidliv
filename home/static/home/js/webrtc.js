@@ -401,7 +401,9 @@ var PHONE = window.PHONE = function(config) {
 
         vid.setAttribute( 'autoplay', 'autoplay' );
         vid.setAttribute( 'data-number', number );
-        vid.src = URL.createObjectURL(stream);
+        vid.setAttribute('width', '100%');
+        vid.setAttribute('height', '100%');
+        vid.srcObject = stream;
 
         talk.video = vid;
         talk.connect(talk);

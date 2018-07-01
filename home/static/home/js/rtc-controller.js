@@ -73,8 +73,10 @@ var CONTROLLER = window.CONTROLLER = function(phone, serverFunc){
 	
 	function broadcast(vid){
 	    var video = document.createElement('video');
-        video.src    = URL.createObjectURL(phone.mystream);
+        video.srcObject    = phone.mystream;
         video.volume = 0.0;
+        video.setAttribute('width', '100%');
+        video.setAttribute('height', '100%');
         video.play();
 	    video.setAttribute( 'autoplay', 'autoplay' );
 	    video.setAttribute( 'data-number', phone.number() );
