@@ -6,13 +6,14 @@
     <script src="{% static 'home/js/pubnub.js' %}"></script>
     <script src="{% static 'home/js/webrtc.js' %}"></script>
     <script src="{% static 'home/js/rtc-controller.js' %}"></script>
+    <script src="{% static 'home/js/phone.js' %}"></script>
     <script type="text/javascript">
-        const pubnub = window.pubnub = PUBNUB.init({
+        const pubnubmain = window.pubnubmain = PUBNUB.init({
             publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
             subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda',
             ssl: true
         });
-        pubnub.subscribe({
+        pubnubmain.subscribe({
             restore: true,
             channel: '{{ request.user.username }}',
             message: (message) => {
@@ -21,77 +22,25 @@
                         closable: false
                     }).modal('show');
                     $('#denyCallButton').click(() => {
-                        pubnub.publish({
+                        pubnubmain.publish({
                             channel: message.number,
                             message: {
                                 type: 'callRequestDeny',
-                                id: pubnub.get_uuid(),
+                                id: pubnubmain.get_uuid(),
                                 number: '{{ request.user.username }}'
                             }
                         });
                     });
                     $('#acceptCallButton').click(() => {
-                        pubnub.publish({
+                        pubnubmain.publish({
                             channel: message.number,
                             message: {
                                 type: 'callRequestAccept',
-                                id: pubnub.get_uuid(),
+                                id: pubnubmain.get_uuid(),
                                 number: '{{ request.user.username }}'
                             },
                             callback: message => {
-                                const video_out = document.getElementById('vid-box');
-                                const vid_thumb = document.getElementById('vid-thumb');
-                                const phone = window.phone = PHONE({
-                                    number: '{{ request.user.username }}',
-                                    publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
-                                    subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda'
-                                });
-                                const ctrl = window.ctrl = CONTROLLER(phone);
-                                ctrl.receive(session => {
-                                    session.connected(session => {
-                                        $('#videoCallModal').modal({
-                                            closable: false
-                                        }).modal('show');
-                                        ctrl.addLocalStream(vid_thumb);
-                                        video_out.appendChild(session.video);
-                                    });
-                                    session.ended(session => {
-                                        vid_thumb.innerHTML = '';
-                                        ctrl.getVideoElement(session.number).remove();
-                                        $('#videoCallModal').modal('hide');
-                                    })
-                                });
-                                ctrl.videoToggled((session, isEnabled) => {
-                                    ctrl.getVideoElement(session.number).toggle(isEnabled);
-                                });
-                                ctrl.audioToggled((session, isEnabled)=> {
-                                    ctrl.getVideoElement(session.number).css('opacity', isEnabled ? 1: 0.75);
-                                });
-                                $('#endCallButton').click(() => {
-                                    if (phone) ctrl.hangup();
-                                });
-                                $('#muteCallButton').click(() => {
-                                    if (ctrl) {
-                                        const audio = ctrl.toggleAudio();
-                                        if (!audio) $('#muteCallButton').html('' +
-                                            '<i class="unmute icon"></i>\n' +
-                                            'Unmute');
-                                        else $('#muteCallButton').html('' +
-                                            '<i class="mute icon"></i>\n' +
-                                            'Mute');
-                                    }
-                                });
-                                $('#pauseCallButton').click(() => {
-                                    if (ctrl) {
-                                        const video = ctrl.toggleVideo();
-                                        if (!video) $('#pauseCallButton').html('' +
-                                            '<i class="play icon"></i>\n' +
-                                            'Play');
-                                        else $('#pauseCallButton').html('' +
-                                            '<i class="pause icon"></i>\n' +
-                                            'Pause');
-                                    }
-                                });
+                                start_phone('{{ request.user.username }}', message.number, false);
                             }
                         });
                     });
@@ -99,70 +48,7 @@
                     $('#requestCallModal').modal('hide');
                     $('#userNotAvailModal').modal({closable: false}).modal('show');
                 } else if (message.type === 'callRequestAccept') {
-                    const video_out = document.getElementById('vid-box');
-                    const video_thumb = document.getElementById('vid_thumb');
-                    const phone = window.phone = PHONE({
-                        number: '{{ request.user.username }}',
-                        publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
-                        subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda',
-                        ssl: true
-                    });
-                    const ctrl = window.ctrl = CONTROLLER(phone);
-                    ctrl.ready(() => {
-                        //if (phone.number() === message.number) return false;
-                        //ctrl.isOnline(message.number, isOn => {
-                        //    if (isOn) ctrl.dial(message.number);
-                        //    else {
-                        //        $('#requestCallModal').modal('hide');
-                        //        $('#userNotAvailModal').modal({closable: false}).modal('show');
-                        //    }
-                        //});
-                        ctrl.dial(message.number);
-                    });
-                    ctrl.receive(session => {
-                        session.connected(session => {
-                            $('#requestCallModal').modal('hide');
-                            $('#videoCallModal').modal({closable: false}).modal('show');
-                            ctrl.addLocalStream(video_thumb);
-                            video_out.appendChild(session.video);
-                        });
-                        session.ended(session => {
-                            video_thumb.innerHTML = '';
-                            ctrl.getVideoElement(session.number).remove();
-                            $('#videoCallModal').modal('hide');
-                        });
-                    });
-                    ctrl.videoToggled((session, isEnabled) => {
-                        ctrl.getVideoElement(session.number).toggle(isEnabled);
-                    });
-                    ctrl.audioToggled((session, isEnabled) => {
-                        ctrl.getVideoElement(session.number).css('opacity', isEnabled ? 1: 0.75);
-                    });
-                    $('#endCallButton').click(() => {
-                        if (phone) ctrl.hangup();
-                    });
-                    $('#muteCallButton').click(() => {
-                        if (ctrl) {
-                            const audio = ctrl.toggleAudio();
-                            if (!audio) $('#muteCallButton').html('' +
-                                '<i class="unmute icon"></i>\n' +
-                                'Unmute');
-                            else $('#muteCallButton').html('' +
-                                '<i class="mute icon"></i>\n' +
-                                'Mute');
-                        }
-                    });
-                    $('#pauseCallButton').click(() => {
-                        if (ctrl) {
-                            const video = ctrl.toggleVideo();
-                            if (!video) $('#pauseCallButton').html('' +
-                                '<i class="play icon"></i>\n' +
-                                'Play');
-                            else $('#pauseCallButton').html('' +
-                                '<i class="pause icon"></i>\n' +
-                                'Pause');
-                        }
-                    });
+                   start_phone('{{ request.user.username }}', message.number, true);
                 } else if (message.type === 'callRequestCancel') {
                     // TODO add call request cancel methods
                 }
@@ -173,11 +59,11 @@
             $('#requestCallModal').modal({
                 closable: false
             }).modal('show');
-            pubnub.publish({
+            pubnubmain.publish({
                 channel: username,
                 message: {
                     type: 'callRequest',
-                    id: pubnub.get_uuid(),
+                    id: pubnubmain.get_uuid(),
                     number: '{{ request.user.username }}'
                 }
             });
