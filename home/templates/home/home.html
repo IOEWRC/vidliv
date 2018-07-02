@@ -81,9 +81,11 @@
         }
         $(window).bind('beforeunload', () => {
             if (phone) {
+                phone.hangup();
                 phone.unsubscribe();
             }
             if (ctrl) {
+                ctrl.hangup();
                 ctrl.unsubscribe();
             }
         });
