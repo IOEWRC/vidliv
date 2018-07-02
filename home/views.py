@@ -12,3 +12,6 @@ class UserListView(ListView):
     model = User
     context_object_name = 'user_list'
     template_name = 'home/home.html'
+
+    def get_queryset(self):
+        return User.objects.exclude(username=self.request.user.username)
