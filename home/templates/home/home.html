@@ -14,7 +14,7 @@
             publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
             subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda'
         });
-        const ctrl = window.ctrl = CONTROLLER(phone);
+        const ctrl = window.ctrl = CONTROLLER(phone, get_xirsys_servers);
         ctrl.receive(session => {
             session.connected(session => {
                 $('#videoCallModal').modal({
