@@ -79,6 +79,14 @@
             console.log('Adding ' + username);
             startCall(username);
         }
+        $(window).bind('beforeunload', () => {
+            if (phone) {
+                phone.unsubscribe();
+            }
+            if (ctrl) {
+                ctrl.unsubscribe();
+            }
+        });
     </script>
 {% endblock %}
 
