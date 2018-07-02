@@ -20,13 +20,15 @@
                 $('#videoCallModal').modal({
                     closable: false
                 }).modal('show');
-                ctrl.addLocalStream(vid_thumb);
+                if ($('#vid-thumb video').length < 1) ctrl.addLocalStream(vid_thumb);
                 video_out.appendChild(session.video);
             });
             session.ended(session => {
-                vid_thumb.innerHTML = '';
                 ctrl.getVideoElement(session.number).remove();
-                $('#videoCallModal').modal('hide');
+                if ($('#vid-box video').length === 0) {
+                    $('#vid-thumb').empty();
+                    $('#videoCallModal').modal('hide');
+                }
             })
         });
         ctrl.videoToggled((session, isEnabled) => {
@@ -73,6 +75,10 @@
                     'Pause');
             }
         });
+        function addUser(username) {
+            console.log('Adding ' + username);
+            startCall(username);
+        }
     </script>
 {% endblock %}
 

@@ -98,19 +98,19 @@ var CONTROLLER = window.CONTROLLER = function(phone, serverFunc){
     
     CONTROLLER.stream = function(){
 	    stream_subscribe();
-    }
+    };
     
     CONTROLLER.joinStream = function(name){
 	    stream_subscribe(name);
 	    publishCtrl(controlChannel(name), "userJoin", phone.number());
-    }
+    };
     
     CONTROLLER.leaveStream = function(name){
 	    var ch = (name ? name : phone.number()) + "-stream";
 	    pubnub.unsubscribe({
             channel    : ch,
         });
-    }
+    };
     
     CONTROLLER.send = function( message, number ) {
         if (phone.oneway) return stream_message(message);
