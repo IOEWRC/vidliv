@@ -111,7 +111,14 @@ var CONTROLLER = window.CONTROLLER = function(phone, serverFunc){
             channel    : ch,
         });
     };
-    
+
+    CONTROLLER.unsubscribe = () => {
+    	pubnub.unsubscribe({
+			channel: ctrlChan,
+			callback: () => {console.log('Unsubscribed to ' + ctrlChan)}
+		})
+	};
+
     CONTROLLER.send = function( message, number ) {
         if (phone.oneway) return stream_message(message);
         phone.send(message, number);

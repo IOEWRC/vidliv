@@ -371,7 +371,7 @@ var PHONE = window.PHONE = function(config) {
         // Video Settings
         video.width  = snap.width;
         video.height = snap.height;
-        video.src    = URL.createObjectURL(stream);
+        video.srcObject    = stream;
         video.volume = 0.0;
         video.play();
 
@@ -449,6 +449,13 @@ var PHONE = window.PHONE = function(config) {
             connect    : function() { onready(true) }
         });
     }
+
+    PHONE.unsubscribe = () => {
+        pubnub.unsubscribe({
+            channel: config.number,
+            callback: () => {console.log('Unsubscribed to ' + config.number)}
+        });
+    };
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // When Ready to Receive Calls
