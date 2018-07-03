@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block script %}
+    <script src="{% static 'home/js/pubnub.js' %}"></script>
+    <script src="{% static 'home/js/webrtc.js' %}"></script>
+    <script src="{% static 'home/js/rtc-controller.js' %}"></script>
+    <script type="text/javascript">
+        var video_out = document.getElementById('vid-box');
+        var viewer = '{{ request.user.username }}';
+        var streamName = '{{ streamName }}';
+        var phone = window.phone = PHONE({
+            number: viewer,
+            publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
+            subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda',
+            oneway: true
+        });
+        var ctrl = window.ctrl = CONTROLLER(phone, get_xirsys_servers);
+        ctrl.ready(() => {
+            ctrl.isStreaming(streamName, isOn => {
+                if (isOn) ctrl.joinStream(streamName);
+                else alert(streamName + ' is not streaming!');
+            });
+        });
+        ctrl.receive(session => {
+            session.connected(session => {
+                video_out.appendChild(session.video);
+            });
+        });
+
+    </script>
+{% endblock %}
+{% block content %}
+    <div id="vid-box"></div>
+    <button class="ui inverted red button" id="leaveStreamButton">Leave</button>
+{% endblock %}

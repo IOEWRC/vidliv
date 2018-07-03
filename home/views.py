@@ -15,3 +15,9 @@ class UserListView(ListView):
 
     def get_queryset(self):
         return User.objects.exclude(username=self.request.user.username)
+
+
+def broadcast_view(request, username=None):
+    if username is None:
+        return render(request, 'home/broadcaster.html', {})
+    return render(request, 'home/viewer.html', {'streamName': username})

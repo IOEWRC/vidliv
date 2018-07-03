@@ -95,6 +95,7 @@
 {% block content %}
     <p><h1>Welcome to VidLIV</h1></p>
     <p>Coming soon</p>
+    <a class="ui teal button" href="{% url 'home:golive' %}">Go Live</a>
     <div id="userList">
     <table class="ui teal table">
         <thead>
@@ -109,6 +110,7 @@
             <td>{{ usr.username }}</td>
             <td>
                 <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
+                <a class="ui inverted teal button" href="{% url 'home:watchlive' username=usr.username %}">Watch Live</a>
             </td>
             </tr>
         {% endfor %}
