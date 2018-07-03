@@ -37,13 +37,18 @@
 <!-- script for semantic-ui -->
 <script type="text/javascript" src="{% static 'js/jquery-3.1.1.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/semantic.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/particles.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jquery.particleground.min.js' %}"></script>
 
 {# javascript goes here #}
 {% block script %}{% endblock %}
 <script>
-    $(document)
-    .ready(function() {
+    $(document).ready(function() {
+
+      $('#particles').particleground({
+        dotColor: '#fee',
+        lineColor: '#eff',
+        density: 7000,
+      });
       // fix main menu to page on passing
       $('.main.menu').visibility({
         type: 'fixed'
