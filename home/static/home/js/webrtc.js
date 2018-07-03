@@ -400,6 +400,7 @@ var PHONE = window.PHONE = function(config) {
         var talk   = get_conversation(number);
 
         vid.setAttribute( 'autoplay', 'autoplay' );
+        vid.setAttribute('controls', 'controls');
         vid.setAttribute( 'data-number', number );
         vid.setAttribute('width', '100%');
         vid.setAttribute('height', '100%');
