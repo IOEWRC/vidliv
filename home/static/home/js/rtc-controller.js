@@ -292,13 +292,13 @@ var CONTROLLER = window.CONTROLLER = function(phone, serverFunc){
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Request fresh TURN servers from XirSys - Need to explain.
-// room=default&application=default&domain=kevingleason.me&ident=gleasonk&secret=b9066b5e-1f75-11e5-866a-c400956a1e19
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function get_xirsys_servers() {
     var servers;
     $.ajax({
         url: "https://global.xirsys.net/_turn/pubnubClone/",
         type: "PUT",
+        async: false,
         headers: {
             "Authorization": "Basic " + btoa("sagarspkt:7f7426ee-641c-11e8-b8af-f00c404ee570")
         },
