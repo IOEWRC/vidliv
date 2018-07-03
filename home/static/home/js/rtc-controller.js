@@ -299,16 +299,13 @@ function get_xirsys_servers() {
     $.ajax({
         url: "https://global.xirsys.net/_turn/pubnubClone/",
         type: "PUT",
-        async: false,
         headers: {
             "Authorization": "Basic " + btoa("sagarspkt:7f7426ee-641c-11e8-b8af-f00c404ee570")
         },
         success: function(res) {
-            console.log(res);
-            res = JSON.parse(res);
-            if (!res.e) servers = res.d.iceServers;
+            console.log(res.v);
+            if (!res.e) servers = res.v.iceServers;
         },
-        async: false
     });
     return servers;
 }
