@@ -144,6 +144,7 @@ class ProfileForm(forms.ModelForm):
         model = UserProfile
         fields = ['location', 'avatar', 'phone_number', 'gender', 'about_me']
 
+
 class CustomRegistrationForm(
     RegistrationFormUniqueEmail,
     RegistrationFormUsernameLowercase

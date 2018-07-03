@@ -5,19 +5,19 @@
     <!-- Standard Meta -->
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
     <link rel="icon" href="{% static 'img/favicon.ico' %}">
-   
+
     <!-- Title here -->
     <title>{% block title %}vidliv{% endblock %}</title>
-    
+
     <!-- Css files link here -->
     <link rel="stylesheet" href="{% static 'css/semantic.css' %}">
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
-    
+
    <!-- Fonts and icons -->
     <link href="https://fonts.googleapis.com/css?family=Oleo+Script+Swash+Caps" rel="stylesheet">
-  
+
     <!-- {# stylesheet for respective pages goes here #} -->
 
     {% block stylesheet %}{% endblock %}
@@ -27,6 +27,7 @@
 
 {# this block name must not be changed #}
 {% block content %}{% endblock %}
+
 <div id="particles"></div>
 <br>
 <div id="particles"></div>
@@ -36,15 +37,18 @@
 <!-- script for semantic-ui -->
 <script type="text/javascript" src="{% static 'js/jquery-3.1.1.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/semantic.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/particles.js' %}"></script>
-
-</body>
+<script type="text/javascript" src="{% static 'js/jquery.particleground.min.js' %}"></script>
 
 {# javascript goes here #}
 {% block script %}{% endblock %}
 <script>
-    $(document)
-    .ready(function() {
+    $(document).ready(function() {
+
+      $('#particles').particleground({
+        dotColor: '#fee',
+        lineColor: '#eff',
+        density: 7000,
+      });
       // fix main menu to page on passing
       $('.main.menu').visibility({
         type: 'fixed'
@@ -55,4 +59,5 @@
       });
     });
 </script>
+</body>
 </html>

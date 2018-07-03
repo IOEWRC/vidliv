@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title_name %}VidLIV: Home{% endblock %}
+
+{% block script %}
+    <script src="{% static 'home/js/pubnub.js' %}"></script>
+    <script src="{% static 'home/js/webrtc.js' %}"></script>
+    <script src="{% static 'home/js/rtc-controller.js' %}"></script>
+    <script type="text/javascript">
+        const video_out = document.getElementById('vid-box');
+        const vid_thumb = document.getElementById('vid-thumb');
+        const phone = window.phone = PHONE({
+            number: '{{ request.user.username }}',
+            publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
+            subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda'
+        });
+        const ctrl = window.ctrl = CONTROLLER(phone, get_xirsys_servers);
+        ctrl.receive(session => {
+            session.connected(session => {
+                $('#videoCallModal').modal({
+                    closable: false
+                }).modal('show');
+                if ($('#vid-thumb video').length < 1) ctrl.addLocalStream(vid_thumb);
+                video_out.appendChild(session.video);
+            });
+            session.ended(session => {
+                ctrl.getVideoElement(session.number).remove();
+                if ($('#vid-box video').length === 0) {
+                    $('#vid-thumb').empty();
+                    $('#videoCallModal').modal('hide');
+                }
+            })
+        });
+        ctrl.videoToggled((session, isEnabled) => {
+            ctrl.getVideoElement(session.number).toggle(isEnabled);
+        });
+        ctrl.audioToggled((session, isEnabled)=> {
+            ctrl.getVideoElement(session.number).css('opacity', isEnabled ? 1: 0.75);
+        });
+        function startCall(username) {
+            if (!window.phone) alert("Currently not working.");
+            if (phone.number() === username) return false;
+            ctrl.isOnline(username, isOn => {
+                if (isOn) {
+                    $('#videoCallModal').modal({
+                        closable: false
+                    }).modal('show');
+                    ctrl.dial(username);
+                }
+                else alert(username + ' is offline');
+            });
+        }
+        $('#endCallButton').click(() => {
+            if (phone) ctrl.hangup();
+        });
+        $('#muteCallButton').click(() => {
+            if (ctrl) {
+                const audio = ctrl.toggleAudio();
+                if (!audio) $('#muteCallButton').html('' +
+                    '<i class="unmute icon"></i>\n' +
+                    'Unmute');
+                else $('#muteCallButton').html('' +
+                    '<i class="mute icon"></i>\n' +
+                    'Mute');
+            }
+        });
+        $('#pauseCallButton').click(() => {
+            if (ctrl) {
+                const video = ctrl.toggleVideo();
+                if (!video) $('#pauseCallButton').html('' +
+                    '<i class="play icon"></i>\n' +
+                    'Play');
+                else $('#pauseCallButton').html('' +
+                    '<i class="pause icon"></i>\n' +
+                    'Pause');
+            }
+        });
+        function addUser(username) {
+            console.log('Adding ' + username);
+            startCall(username);
+        }
+        $(window).bind('beforeunload', () => {
+            if (phone) {
+                phone.hangup();
+                phone.unsubscribe();
+            }
+            if (ctrl) {
+                ctrl.hangup();
+                ctrl.unsubscribe();
+            }
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <p><h1>Welcome to VidLIV</h1></p>
+    <p>Coming soon</p>
+    <div id="userList">
+    <table class="ui teal table">
+        <thead>
+        <tr>
+            <td>users</td>
+            <td>actions</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for usr in user_list %}
+            <tr>
+            <td>{{ usr.username }}</td>
+            <td>
+                <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
+            </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% block call %}{% include 'home/call.html' %}{% endblock %}
+{% endblock %}

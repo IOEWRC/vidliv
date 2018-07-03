@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'test_home_app.apps.TestHomeAppConfig',
+    'home.apps.HomeAppConfig',
     'widget_tweaks'
 ]
 
@@ -132,9 +132,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 ACCOUNT_ACTIVATION_DAYS = 7  # One-week activation window; you may, of course, use a different value.
 REGISTRATION_AUTO_LOGIN = True  # Automatically log the user in.
 
-LOGIN_REDIRECT_URL = 'test_home_app:home'  # TODO login redirect url to be final home url
+LOGIN_REDIRECT_URL = 'home:home'  # TODO login redirect url to be final home url
 LOGIN_URL = 'auth_login'
-LOGOUT_URL = 'auth_logout'
+LOGOUT_URL = 'landing_page'
 
 
 # no login required views goes here

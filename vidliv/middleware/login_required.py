@@ -1,4 +1,5 @@
-from django.urls import resolve
+from django.http import HttpResponseRedirect
+from django.urls import resolve, reverse
 from django.conf import settings
 from django.shortcuts import redirect
 
@@ -22,4 +23,4 @@ class LoginRequiredMiddleWare:
         elif request.user.is_authenticated or (request_view in EXEMPT_VIEWS):
             return None
         else:
-            return redirect(settings.LOGIN_URL)
+            return HttpResponseRedirect(reverse('auth_login') + '?next=' + request.path_info)

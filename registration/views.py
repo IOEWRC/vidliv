@@ -6,7 +6,6 @@ Views which allow users to create and activate accounts.
 from django.conf import settings
 from django.shortcuts import redirect, render, get_object_or_404
 from django.utils.decorators import method_decorator
-from django.utils.module_loading import import_string
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView

@@ -25,6 +25,7 @@ consult a specific backend's documentation for details.
 from django.conf.urls import url
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
+from . import views
 
 urlpatterns = [
     url(r'^login/$',
@@ -33,7 +34,9 @@ urlpatterns = [
         name='auth_login'),
     url(r'^logout/$',
         auth_views.LogoutView.as_view(
-            template_name='registration/logout.html'),
+            template_name='landingpage.html',
+            extra_context={'logout_redirected': True}
+        ),
         name='auth_logout'),
     url(r'^password/change/$',
         auth_views.PasswordChangeView.as_view(
@@ -56,4 +59,5 @@ urlpatterns = [
         auth_views.PasswordResetConfirmView.as_view(
             success_url=reverse_lazy('auth_password_reset_complete')),
         name='auth_password_reset_confirm'),
+    url(r'^edit-profile', views.edit_profile, name='edit_profile')
 ]
