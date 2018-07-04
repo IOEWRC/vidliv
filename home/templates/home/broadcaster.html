@@ -16,9 +16,14 @@
         });
         var ctrl = window.ctrl = CONTROLLER(phone, get_xirsys_servers);
         ctrl.ready(() => {
-            ctrl.addLocalStream(video_out);
+            $('#loading').remove();    
+            ctrl.addLocalStream(video_out);           
             ctrl.stream();
         });
+        var ht= 0.5 * screen.height;
+        var wd = 0.6 * window.width;
+        $('#vid-box').css({'width': wd,'height':ht})
+
         $('#streamEndButton').click(() => {
             var leaveAns = confirm("Are you sure you want to leave stream?");
             if (leaveAns) {
@@ -40,8 +45,29 @@
             }
         });
     </script>
+    <style>
+        
+
+    </style>
+   
 {% endblock %}
 {% block content %}
-    <div id="vid-box"></div>
-    <button class="ui inverted red button" id="streamEndButton">End</button>
+    <div class="ui stackable two column grid container">
+            <div class="column">
+                <div class="ui inverted segment" id="vid-box">
+                    <div id="loading" class="ui active inverted loader"></div>                   
+                       
+                </div>  
+                <button class="ui inverted red button" id="streamEndButton">End</button>
+            </div>
+        
+            <div class="column">  
+                <h5 class="ui header">Live Chat</h5>  
+                <div class="ui chatroom" id="chatbox">
+                    <div class="ui fluid action input">
+                        <input placeholder="Chat..." type="text">
+                    </div>
+                </div>
+            </div>     
+    </div>
 {% endblock %}

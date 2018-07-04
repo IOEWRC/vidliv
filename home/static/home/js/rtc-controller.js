@@ -73,7 +73,7 @@ var CONTROLLER = window.CONTROLLER = function(phone, serverFunc){
 	
 	function broadcast(vid){
 	    var video = document.createElement('video');
-        video.srcObject    = phone.mystream;
+        video.srcObject = phone.mystream;
         video.volume = 0.0;
         video.setAttribute('width', '100%');
         video.setAttribute('height', '100%');
