@@ -13,7 +13,7 @@ body{
   font-size: 25px;
   font-family: 'Oleo Script Swash Caps', cursive;
   padding: 0 auto !important;
-  color: rgb(89, 25, 128) ;
+  /* color: rgb(89, 25, 128) ; */
 }
 
 .navitem{
@@ -39,3 +39,13 @@ body{
     position: absolute;
     z-index: -2;
 }
+/* oleo-script-swash-caps-regular - latin */
+@font-face {
+  font-family: 'Oleo Script Swash Caps';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Oleo Script Swash Caps'), local('OleoScriptSwashCaps-Regular'),
+       url('../fonts/oleo-script-swash-caps-v5-latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+       url('../fonts/oleo-script-swash-caps-v5-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
