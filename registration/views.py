@@ -10,6 +10,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
+from home.models import Friend
 from registration.forms import ResendActivationForm
 from django.contrib.auth.models import User
 from .forms import UserForm, ProfileForm, CustomRegistrationForm
@@ -179,12 +180,14 @@ class ApprovalView(TemplateView):
         raise NotImplementedError
 
 
-def view_profile(request, pk=None):
-    if pk:
-        user = get_object_or_404(User, pk=pk)
+def view_profile(request, username=None):
+    if username:
+        user = get_object_or_404(User, username=username)
     else:
         user = request.user
-    return render(request, 'registration/user_profile.html', {'user': user})
+    friend, created = Friend.objects.get_or_create(current_user=request.user)
+    friends = friend.friend_list.all()
+    return render(request, 'registration/user_profile.html', {'user': user, 'friends': friends})
 
 
 def edit_profile(request):

@@ -28,7 +28,7 @@
 
         {% if user.is_authenticated %}
         <div class="ui right item">
-          <a href="{% url 'user_profile' %}" > <i class="user circle outline link icon"></i>{{ request.user.username }}
+          <a href="{% url 'user_profile_self' %}" > <i class="user circle outline link icon"></i>{{ request.user.username }}
           </a>
         </div>
         <div class=" ui dropdown item"><i class="settings icon"></i>

@@ -118,24 +118,28 @@
                         <th></th>
                       </tr></thead>
                       <tbody class="scrollContent">
-                        {% for usr in user_list %}
-                             <tr>
-                              <td>
-                                <h4 class="ui image header">
-                                    {% if usr.profile.avatar %}
-                                        <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image">
-                                    {% else %}
-                                        <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
-                                    {% endif %}
-                                    <div class="content">
-                                        {{ usr.username }}
-                                    </div>
-                              </h4></td>
-                              <td>
-                                <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
-                              </td>
-                            </tr>
-                        {% endfor %}
+                        {% if view.friend_list %}
+                            {% for usr in view.friend_list %}
+                                 <tr>
+                                  <td>
+                                    <h4 class="ui image header">
+                                        {% if usr.profile.avatar %}
+                                            <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image">
+                                        {% else %}
+                                            <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
+                                        {% endif %}
+                                        <div class="content">
+                                            <a href='{% url "user_profile_other" username=usr.username %}'>{{ usr.username }}</a>
+                                        </div>
+                                  </h4></td>
+                                  <td>
+                                    <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
+                                  </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <p>No Friends to call !!!. Add some friends first.</p>
+                        {% endif %}
                       </tbody>
                     </table>
                     </div>
@@ -148,24 +152,28 @@
                         <th></th>
                       </tr></thead>
                       <tbody class="scrollContent">
-                        {% for usr in user_list %}
-                             <tr>
-                              <td>
-                                <h4 class="ui image header">
-                                    {% if usr.profile.avatar %}
-                                        <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image">
-                                    {% else %}
-                                        <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
-                                    {% endif %}
-                                    <div class="content">
-                                        {{ usr.username }}
-                                    </div>
-                              </h4></td>
-                              <td>
-                                <button type="button" class="ui red button" onclick="watchLive('{{ usr.username }}', '{% url "home:watchlive" username=usr.username %}')"><i class="play icon"></i>WatchLive</button>
-                              </td>
-                            </tr>
-                        {% endfor %}
+                        {% if view.friend_list %}
+                            {% for usr in view.friend_list %}
+                                 <tr>
+                                  <td>
+                                    <h4 class="ui image header">
+                                        {% if usr.profile.avatar %}
+                                            <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image">
+                                        {% else %}
+                                            <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
+                                        {% endif %}
+                                        <div class="content">
+                                            <a href='{% url "user_profile_other" username=usr.username %}'>{{ usr.username }}</a>
+                                        </div>
+                                  </h4></td>
+                                  <td>
+                                    <button type="button" class="ui red button" onclick="watchLive('{{ usr.username }}', '{% url "home:watchlive" username=usr.username %}')"><i class="play icon"></i>WatchLive</button>
+                                  </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <p>No Friends to watch stream !!!. Add some friends first.</p>
+                        {% endif %}
                       </tbody>
                     </table>
                     </div>

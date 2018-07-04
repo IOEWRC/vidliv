@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
-from django.views.generic import ListView
+from django.views.generic import TemplateView
 from django.contrib.auth.models import User
+from .models import Friend
 
 # PubNub import
 from pubnub.pnconfiguration import PNConfiguration
@@ -12,13 +13,16 @@ from pubnub.pubnub import PubNub
 #     return render(request, 'home/home.html')
 
 
-class UserListView(ListView):
-    model = User
-    context_object_name = 'user_list'
+class UserListView(TemplateView):
     template_name = 'home/home.html'
 
-    def get_queryset(self):
+    def user_list(self):
         return User.objects.exclude(username=self.request.user.username)
+
+    def friend_list(self):
+        friend, created = Friend.objects.get_or_create(current_user=self.request.user)
+        friends = friend.friend_list.all()
+        return friends
 
 
 def broadcast_view(request, username=None):
@@ -37,3 +41,13 @@ def broadcast_view(request, username=None):
         return redirect('home:home')
     else:
         return render(request, 'home/viewer.html', {'streamName': username})
+
+
+def friend_operation(request, operation, pk):
+    new_friend = User.objects.get(pk=pk)
+    if operation == 'addfriend':
+        Friend.add_friend(request.user, new_friend)
+    elif operation == 'unfriend':
+        Friend.unfriend(request.user, new_friend)
+    return redirect('home:home')
+
