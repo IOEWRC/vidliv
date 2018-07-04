@@ -78,8 +78,8 @@ var CONTROLLER = window.CONTROLLER = function(phone, serverFunc){
         video.setAttribute('width', '100%');
         video.setAttribute('height', '100%');
         video.play();
-		video.setAttribute( 'autoplay','autoplay' );
-		video.setAttribute('controls', 'controls');
+	    video.setAttribute( 'autoplay', 'autoplay' );
+	    video.setAttribute('controls', 'controls');
 	    video.setAttribute( 'data-number', phone.number() );
 	    vid.style.cssText ="-moz-transform: scale(-1, 1); \
 						 	-webkit-transform: scale(-1, 1); -o-transform: scale(-1, 1); \
@@ -110,6 +110,7 @@ var CONTROLLER = window.CONTROLLER = function(phone, serverFunc){
 	    var ch = (name ? name : phone.number()) + "-stream";
 	    pubnub.unsubscribe({
             channel    : ch,
+            callback: () => {console.log('Subscribed to ' + ch);}
         });
     };
 
@@ -246,7 +247,7 @@ var CONTROLLER = window.CONTROLLER = function(phone, serverFunc){
 		pubnub.subscribe({
             channel    : ctrlChan,
             message    : receive,
-            connect    : function() {} // console.log("Subscribed to " + ctrlChan); }
+            connect    : function() { console.log("Subscribed to " + ctrlChan); }
         });
 	}
 	

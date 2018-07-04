@@ -400,6 +400,7 @@ var PHONE = window.PHONE = function(config) {
         var talk   = get_conversation(number);
 
         vid.setAttribute( 'autoplay', 'autoplay' );
+        vid.setAttribute('controls', 'controls');
         vid.setAttribute( 'data-number', number );
         vid.setAttribute('width', '100%');
         vid.setAttribute('height', '100%');
@@ -446,7 +447,9 @@ var PHONE = window.PHONE = function(config) {
             message    : receive,
             disconnect : disconnectcb,
             reconnect  : reconnectcb,
-            connect    : function() { onready(true) }
+            connect    : function() {
+                console.log('Subscribed to ' + config.number);
+                onready(true); }
         });
     }
 
@@ -617,7 +620,7 @@ var PHONE = window.PHONE = function(config) {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // Main - Request Camera and Mic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    getusermedia()
+    getusermedia();
 
     return PHONE;
 };
