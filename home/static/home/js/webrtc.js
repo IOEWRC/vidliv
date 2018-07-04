@@ -6,12 +6,13 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 var PHONE = window.PHONE = function(config) {
     config.ssl        = true; // Force HTTPS
+    config.uuid = config.number + '-device'; // unique device id for a user
     var PHONE         = function(){};
     var pubnub        = PUBNUB(config);
     var pubkey        = config.publish_key   || 'demo';
     var snapper       = function(){ return ' ' }
     var subkey        = config.subscribe_key || 'demo';
-    var sessionid     = PUBNUB.uuid();
+    var sessionid     = pubnub.get_uuid();
     var mystream      = null;
     var myvideo       = document.createElement('video');
     var myconnection  = false;
