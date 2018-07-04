@@ -47,7 +47,11 @@
                     }).modal('show');
                     ctrl.dial(username);
                 }
-                else alert(username + ' is offline');
+                else {
+                    $('p#msg').html(username + ' is OFFLINE!!!');
+                    $('p#header').html(username + ' status');
+                    $('#generalModal').modal('setting', 'closable', false).modal('show');
+                }
             });
         }
         $('#endCallButton').click(() => {
@@ -162,7 +166,8 @@
             </div>
         </div>
 <div><br></div>
-    {% block call %}{% include 'home/call.html' %}{% endblock %}
+    </script>
+    {% block call %}{% include 'home/call.html' %}{% include 'home/base.html' %}{% endblock %}
 {% endblock %}
 {% block stylesheet %}
     <style>
