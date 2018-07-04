@@ -48,9 +48,7 @@
                     ctrl.dial(username);
                 }
                 else {
-                    $('p#msg').html(username + ' is OFFLINE!!!');
-                    $('p#header').html(username + ' status');
-                    $('#generalModal').modal('setting', 'closable', false).modal('show');
+                    generalModalFunction(username + ' status', username + ' is OFFLINE!!!');
                 }
             });
         }
@@ -98,9 +96,7 @@
                if (isOn) {console.log('a');
                    window.location.replace(window.location.protocol + '//' + window.location.host + url);}
                else {
-                   $('p#msg').html(username + ' is not streaming !!!');
-                   $('p#header').html(username + ' streaming status');
-                   $('#generalModal').modal('setting', 'closable', false).modal('show');
+                   generalModalFunction(username + ' streaming status', username + ' is not streaming !!!');
                }
             });
         }

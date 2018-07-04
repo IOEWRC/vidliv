@@ -19,9 +19,7 @@
             ctrl.isStreaming(streamName, isOn => {
                 if (isOn) ctrl.joinStream(streamName);
                 else {
-                    $('p#msg').html(streamName + ' is not streaming !!!');
-                   $('p#header').html(streamName + ' streaming status');
-                   $('#generalModal').modal('setting', 'closable', false).modal('show');
+                    generalModalFunction(streamName + ' streaming status', streamName + ' is not streaming !!!');
                 }
             });
         });

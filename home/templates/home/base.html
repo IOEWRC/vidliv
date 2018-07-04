@@ -13,3 +13,11 @@
     </div>
   </div>
 </div>
+
+<script>
+    function generalModalFunction(header, message) {
+        $('p#msg').html(message);
+        $('p#header').html(header);
+        $('#generalModal').modal('setting', 'closable', false).modal('show');
+    }
+</script>
