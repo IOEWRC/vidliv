@@ -62,7 +62,7 @@
         });
         var ht= 0.5 * screen.height;
         var wd = 0.6 * window.width;
-        $('#vid-box').css({'width': wd,'height':ht})
+        $('#vid-box').css({'width': wd,'height':ht});
 
         $('#okButton').click(()=>{
             window.location.replace(window.location.protocol + '//' + window.location.host + '{% url 'home:home' %}');
@@ -88,7 +88,5 @@
             </div>
         </div>
 </div>
-    <div id="vid-box"></div>
-    <button class="ui inverted red button" id="leaveStreamButton">Leave</button>
     {% block call %}{% include 'home/base.html' %}{% endblock %}
 {% endblock %}
