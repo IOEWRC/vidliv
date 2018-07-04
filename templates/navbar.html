@@ -3,12 +3,11 @@
     <div class="ui container">
         <a href="{%url 'landing_page'%}" class="header item">
           <!-- <img class="logo" src="{% static 'img/logo.png'%}"> -->
-            <i class="video icon"></i>
-          Vidliv
+          Vidliv&nbsp;
+          <i class="video icon"></i>
         </a>
-        <div class="item">
-        <a href="{%url 'landing_page'%}" class="ui item navitem "><i class="home link icon"></i>Home</a>
-        </div>
+        <a href="{%url 'landing_page'%}" class="item"><i class="home link icon"></i>Home</a>
+        
         {% if user.is_authenticated %}
         <div class="ui right item">
             <div class="ui search icon input">
@@ -28,11 +27,11 @@
 
         {% if user.is_authenticated %}
         <div class="ui right inverted teal menu">
-          <div class="item">
-          <a href="{% url 'user_profile' %}" > <i class="user circle outline link icon"></i>{{ request.user.username }}
+          
+          <a href="{% url 'user_profile' %}" class="item" > <i class="user circle outline link icon"></i>{{ request.user.username }}
           </a>
-          </div>
-        
+          
+          
         <div class=" ui dropdown item"><i class="settings icon"></i>
           Settings
           <div class="menu">
