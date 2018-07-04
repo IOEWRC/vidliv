@@ -93,16 +93,26 @@
                 ctrl.unsubscribe();
             }
         });
+        function watchLive(username, url) {
+            ctrl.isStreaming(username, isOn =>{
+               if (isOn) {console.log('a');
+                   window.location.replace(window.location.protocol + '//' + window.location.host + url);}
+               else {
+                   $('p#msg').html(username + ' is not streaming !!!');
+                   $('p#header').html(username + ' streaming status');
+                   $('#generalModal').modal('setting', 'closable', false).modal('show');
+               }
+            });
+        }
     </script>
 {% endblock %}
 
 {% block content %}
         <div class="ui container">
             <p><h1>Welcome to VidLIV</h1></p>
-            <button href="{% url 'home:golive'%}" class="ui red button"><i class="video icon"></i>GoLive</button>
+            <a href="{% url 'home:golive'%}" class="ui red button"><i class="video icon"></i>GoLive</a>
         </div>
         <hr>
-        <br>
         <div class="ui stackable grid container">
             <div class="eight wide column">
                     <div id="userList" class="tableContainer">
@@ -156,7 +166,7 @@
                                     </div>
                               </h4></td>
                               <td>
-                                <button type="button" class="ui red button" href="{% url 'home:watchlive' username=usr.username %}"><i class="play icon"></i>WatchLive</button>
+                                <button type="button" class="ui red button" onclick="watchLive('{{ usr.username }}', '{% url "home:watchlive" username=usr.username %}')"><i class="play icon"></i>WatchLive</button>
                               </td>
                             </tr>
                         {% endfor %}
@@ -166,7 +176,6 @@
             </div>
         </div>
 <div><br></div>
-    </script>
     {% block call %}{% include 'home/call.html' %}{% include 'home/base.html' %}{% endblock %}
 {% endblock %}
 {% block stylesheet %}

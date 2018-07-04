@@ -18,7 +18,11 @@
         ctrl.ready(() => {
             ctrl.isStreaming(streamName, isOn => {
                 if (isOn) ctrl.joinStream(streamName);
-                else alert(streamName + ' is not streaming!');
+                else {
+                    $('p#msg').html(streamName + ' is not streaming !!!');
+                   $('p#header').html(streamName + ' streaming status');
+                   $('#generalModal').modal('setting', 'closable', false).modal('show');
+                }
             });
         });
         ctrl.receive(session => {
@@ -55,9 +59,13 @@
                 }
             }
         });
+        $('#okButton').click(()=>{
+            window.location.replace(window.location.protocol + '//' + window.location.host + '{% url 'home:home' %}');
+        });
     </script>
 {% endblock %}
 {% block content %}
     <div id="vid-box"></div>
     <button class="ui inverted red button" id="leaveStreamButton">Leave</button>
+    {% block call %}{% include 'home/base.html' %}{% endblock %}
 {% endblock %}
