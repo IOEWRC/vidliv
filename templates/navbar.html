@@ -16,14 +16,13 @@
             </div>
         </div>
         {% endif %}
+        
         {% if not user.is_authenticated %}
-        <div class="ui right inverted teal menu">
-           
-              
-          <div><a href="{%url 'registration_register'%}" class="item"><i class="users link icon"></i>Signup</a></div>
-          <div><a href="{% url 'auth_login' %}" class="item"><i class="user circle link icon"></i>Login</a></div>
-          </div>
-          {% endif %}
+        <div class="ui right inverted teal menu">   
+          <a href="{%url 'registration_register'%}" class="item"><i class="users link icon"></i>Signup</a>
+          <a href="{% url 'auth_login' %}" class="item"><i class="user circle link icon"></i>Login</a>
+        </div>
+        {% endif %}
 
         {% if user.is_authenticated %}
         <div class="ui right inverted teal menu">
