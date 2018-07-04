@@ -1,6 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import ListView
 from django.contrib.auth.models import User
+
+# PubNub import
+from pubnub.pnconfiguration import PNConfiguration
+from pubnub.pubnub import PubNub
 
 
 # Create your views here.
@@ -20,4 +24,16 @@ class UserListView(ListView):
 def broadcast_view(request, username=None):
     if username is None:
         return render(request, 'home/broadcaster.html', {})
-    return render(request, 'home/viewer.html', {'streamName': username})
+
+    # PubNub instance
+    pnconfig = PNConfiguration()
+    pnconfig.subscribe_key = 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda'
+    pnconfig.publish_key = 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792'
+    pnconfig.ssl = True
+
+    pubnub =PubNub(pnconfig)
+    envelope = pubnub.where_now().uuid(username + '-device').sync()
+    if username + '-stream' not in envelope.result.channels:
+        return redirect('home:home')
+    else:
+        return render(request, 'home/viewer.html', {'streamName': username})
