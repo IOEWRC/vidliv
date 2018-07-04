@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views.generic import ListView
 from django.contrib.auth.models import User
@@ -34,6 +35,7 @@ def broadcast_view(request, username=None):
     pubnub =PubNub(pnconfig)
     envelope = pubnub.where_now().uuid(username + '-device').sync()
     if username + '-stream' not in envelope.result.channels:
+        messages.info(request, username + ' is not streaming', extra_tags=username + ' status')
         return redirect('home:home')
     else:
         return render(request, 'home/viewer.html', {'streamName': username})

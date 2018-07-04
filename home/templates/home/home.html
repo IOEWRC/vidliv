@@ -7,6 +7,11 @@
     <script src="{% static 'home/js/webrtc.js' %}"></script>
     <script src="{% static 'home/js/rtc-controller.js' %}"></script>
     <script type="text/javascript">
+        {% if messages %}
+            {% for message in messages %}
+                generalModalFunction('{{ message.extra_tags }}', '{{ message }}');
+            {% endfor %}
+        {% endif %}
         const video_out = document.getElementById('vid-box');
         const vid_thumb = document.getElementById('vid-thumb');
         const phone = window.phone = PHONE({
