@@ -110,6 +110,7 @@ var CONTROLLER = window.CONTROLLER = function(phone, serverFunc){
 	    var ch = (name ? name : phone.number()) + "-stream";
 	    pubnub.unsubscribe({
             channel    : ch,
+            callback: () => {console.log('Subscribed to ' + ch);}
         });
     };
 
@@ -246,7 +247,7 @@ var CONTROLLER = window.CONTROLLER = function(phone, serverFunc){
 		pubnub.subscribe({
             channel    : ctrlChan,
             message    : receive,
-            connect    : function() {} // console.log("Subscribed to " + ctrlChan); }
+            connect    : function() { console.log("Subscribed to " + ctrlChan); }
         });
 	}
 	

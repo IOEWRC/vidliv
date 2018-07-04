@@ -18,7 +18,27 @@
         ctrl.ready(() => {
             ctrl.addLocalStream(video_out);
             ctrl.stream();
-        })
+        });
+        $('#streamEndButton').click(() => {
+            var leaveAns = confirm("Are you sure you want to leave stream?");
+            if (leaveAns) {
+                if (window.phone) {
+                    ctrl.hangup();
+                    ctrl.leaveStream(streamName);
+                    ctrl.unsubscribe();
+                    phone.unsubscribe();
+                }
+                window.location.replace(window.location.protocol + '//' + window.location.host + '{% url 'home:home' %}');
+            }
+        });
+        $(window).bind('beforeunload', () => {
+            if (window.phone) {
+                ctrl.hangup();
+                ctrl.leaveStream(streamName);
+                ctrl.unsubscribe();
+                phone.unsubscribe();
+            }
+        });
     </script>
 {% endblock %}
 {% block content %}

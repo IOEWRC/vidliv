@@ -447,7 +447,9 @@ var PHONE = window.PHONE = function(config) {
             message    : receive,
             disconnect : disconnectcb,
             reconnect  : reconnectcb,
-            connect    : function() { onready(true) }
+            connect    : function() {
+                console.log('Subscribed to ' + config.number);
+                onready(true); }
         });
     }
 
@@ -618,7 +620,7 @@ var PHONE = window.PHONE = function(config) {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // Main - Request Camera and Mic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    getusermedia()
+    getusermedia();
 
     return PHONE;
 };
