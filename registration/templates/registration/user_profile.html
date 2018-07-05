@@ -27,9 +27,9 @@
                 <a class="ui button teal" href="{% url 'edit_profile' %}" ><span>Update Profile</span></a>
             {% else %}
                 {% if user in friends %}
-                <a class="ui button teal" href="{% url 'home:friendOperation' operation='unfriend' pk=user.pk %}"><span><i class="minus circle icon"></i>Unfriend</span></a>
+                <a class="ui button teal" href="{% url 'home:friendOperation' operation='unfriend' pk=user.pk %}"><span><i class="minus circle icon"></i>UnFollow</span></a>
                 {% else %}
-                    <a class="ui button teal" href="{% url 'home:friendOperation' operation='addfriend' pk=user.pk %}"><span><i class="plus circle icon"></i>Friend</span></a>
+                    <a class="ui button teal" href="{% url 'home:friendOperation' operation='addfriend' pk=user.pk %}"><span><i class="plus circle icon"></i>Follow</span></a>
                 {% endif %}
             {% endif %}
                 <br><hr>
