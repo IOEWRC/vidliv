@@ -714,6 +714,16 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.username
 
+    @property
+    def get_avatar(self):
+        if self.avatar:
+            return self.avatar.url
+        else:
+            if self.gender == 'Male':
+                return "/static/img/matthew.png"
+            else:
+                return "/static/img/molly.png"
+
 
 @receiver(post_save, sender=User)
 def create_profile(sender, **kwargs):

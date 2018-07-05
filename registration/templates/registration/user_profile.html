@@ -9,18 +9,8 @@
     <div class="ui container main">
     <div class="destacados ui two column centered grid">
             <div class="box1">
-                {% if not user.profile.avatar %}
-                {% if user.profile.get_gender_display == "Male" %}
-                <img src="{% static 'img/matthew.png' %}" class="ui small circular image centered">
-                {% elif user.profile.get_gender_display == "Female" %}
-                <img src="{% static 'img/molly.png' %}" class="ui small circular image centered">
-                {%endif%}
-                    
-                   
-                {% else %}
-                    <img src="{{ user.profile.avatar.url }}" class="ui small circular image centered" style="width: 100px;height: 100px">
-                     <br /> <br />
-                {% endif %}
+                <img src="{{ user.profile.get_avatar }}" class="ui small circular image centered" style="width: 150px;height: 150px">
+                     <br/>
 
               <h3>{{ user.get_full_name }}</h3>
             <h4 style="color:teal">Username :&nbsp;{{ user.username }}</h4>

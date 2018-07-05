@@ -28,16 +28,7 @@
           
           <a href="{% url 'user_profile' request.user.username %}" class="item" >
 
-          {% if not request.user.profile.avatar %}
-
-              {% if request.user.profile.get_gender_display == "Male" %}
-              <img src="{% static 'img/matthew.png'%}" class="ui small circular image" style="width: 35px;height: 35px">
-              {% elif request.user.profile.get_gender_display == "Female" %}
-              <img src="{% static 'img/molly.png'%}" class="ui small circular image" style="width: 35px;height: 35px">
-              {%endif%}
-
-          {% else %}
-              <img src="{{ request.user.profile.avatar.url }}" class="ui small circular image" style="width: 35px;height: 35px">
+              <img src="{{ request.user.profile.get_avatar }}" class="ui small circular image" style="width: 35px;height: 35px">
                <br /> <br />
           {% endif %}
             &nbsp; {{ request.user.get_full_name }}
@@ -59,7 +50,6 @@
           </div>
           </div>
           </div>
-          {%endif%}
         
     </div>
     </div>
