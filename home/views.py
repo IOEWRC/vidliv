@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from django.templatetags.static import static
 from django.urls import reverse
 from django.views.generic import TemplateView
+from django.http import Http404
 from django.contrib.auth.models import User
 from django.db.models import Q
 from .models import Friend
@@ -79,3 +79,22 @@ def get_username(request):
             }
             results['results'].append(username_json)
         return JsonResponse(results)
+
+
+def multi_broadcast(request, action=None, username=None):
+    if not username:
+        return render(request, 'home/multi_broadcaster.html', {
+            'broadcaster': True,
+            'roomid': request.user.username + '-stream_room',
+        })
+    elif username and action == 'view':
+        return render(request, 'home/multi_broadcaster.html', {
+            'broadcaster': False,
+            'roomid': username + '-stream_room',
+        })
+    elif username and action == 'join':
+        return render(request, 'home/multi_broadcaster.html', {
+            'broadcaster': True,
+            'roomid': username + '-stream_room',
+        })
+    raise Http404

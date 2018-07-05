@@ -1,4 +1,3 @@
-from django.conf.urls import url
 from django.urls import path
 from . import views
 
@@ -11,4 +10,6 @@ urlpatterns = [
     path('broadcast/<str:username>/', views.broadcast_view, name='watchlive'),
     path('friends/<str:operation>/<int:pk>/', views.friend_operation, name='friendOperation'),
     path('api/get_username/', views.get_username, name='searchAutoComplete'),
+    path('multibroadcast/', views.multi_broadcast, name='gomultibroadcast'),
+    path('multibroadcast/<str:action>/<str:username>', views.multi_broadcast, name='multistreamaction'),
 ]
