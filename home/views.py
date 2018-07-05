@@ -1,5 +1,8 @@
 from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.templatetags.static import static
+from django.urls import reverse
 from django.views.generic import TemplateView
 from django.contrib.auth.models import User
 from .models import Friend
@@ -53,3 +56,22 @@ def friend_operation(request, operation, pk):
         Friend.unfriend(request.user, new_friend)
     return redirect('home:home')
 
+
+def get_username(request):
+    if request.is_ajax():
+        q = request.GET.get('term', '')
+        users = User.objects.filter(username__icontains=q)
+        results = {'results': []}
+        for user in users:
+            if user.profile.avatar:
+                profile_image = user.profile.avatar.url
+            else:
+                profile_image = static('img/matthew.png')
+            username_json = {
+                'username': user.username,
+                'fullname': user.get_full_name(),
+                'profile_image': profile_image,
+                'profile_url': reverse('user_profile_other', kwargs={'username': user.username})
+            }
+            results['results'].append(username_json)
+        return JsonResponse(results)
