@@ -181,6 +181,8 @@ class ApprovalView(TemplateView):
 
 
 def view_profile(request, username=None):
+    if request.user.username == username:
+        return redirect('user_profile_self')
     if username:
         user = get_object_or_404(User, username=username)
     else:
