@@ -126,7 +126,7 @@ var CONTROLLER = window.CONTROLLER = function(phone, serverFunc){
         phone.send(message, number);
     };
     
-    function stream_message(message){
+    function stream_message(msg){
 	    if (!stream_name) return; // Not in a stream
 		pubnub.publish({ 
 			channel: stream_name,

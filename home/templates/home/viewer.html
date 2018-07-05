@@ -62,10 +62,42 @@
         var wd = 0.6 * window.width;
         $('#vid-box').css({'width': wd,'height':ht});
 
+        $('#enterEvent').keypress(function(e) {
+            if(e.which == 13) {
+                var chatText = document.getElementById('texts').value;
+                message = {text: chatText, type: 'streamMessage', sender: '{{ request.user.username }}'};
+                ctrl.send(message);
+            }
+        });
+        ctrl.streamReceive(message => {
+            document.getElementById('chat-content').innerHTML += '<p>' + message.sender +': ' + message.text + '</p>';
+        });
+        window.setInterval(function() {
+            var elem = document.getElementById('chat-box');
+            elem.scrollTop = elem.scrollHeight;
+          }, 0.00000000001);
         $('#okButton').click(()=>{
-            window.location.replace(window.location.protocol + '//' + window.location.host + '{% url 'home:home' %}');
+            window.location.replace(window.location.protocol + '//' + window.location.host + '{% url "home:home" %}');
         });
     </script>
+    <style>
+            #chat-box{
+                overflow-x: auto;
+                overflow-y: auto; 
+                position:   relative;
+                height:     70%;
+                width:   70%;
+                bottom: 0;   
+            }
+    
+            #chat-content{
+                position: absolute;
+            }
+    
+            #enterEvent{
+                width:   70%;
+            }    
+        </style>
 {% endblock %}
 {% block content %}
 <div class="ui stackable two column grid container">
@@ -76,6 +108,24 @@
             </div>
             <button class="ui inverted red button" id="leaveStreamButton">Leave</button>
         </div>
+<<<<<<< HEAD
+        <div class="column"> 
+                <div class="ui header">Live Chat</div> 
+
+                <div class="ui top attached tertiary inverted segment" id="chat-box">
+                    <div id="chat-content">
+                        
+                    </div>
+                </div>
+
+                <div class="ui attached segment" id="enterEvent">
+                    <div class="ui small fluid icon input">
+                        <input id="texts" placeholder="CHAT..." type="text">
+                    </div>                           
+                </div>
+        </div>  
+        
+=======
 
         <div class="column">
             <h5 class="ui header">Live Chat</h5>
@@ -85,6 +135,7 @@
                 </div>
             </div>
         </div>
+>>>>>>> 2e2b98b733062cb2ce43ea88b1839da14f725a86
 </div>
     {% block call %}{% include 'home/base.html' %}{% endblock %}
 {% endblock %}
