@@ -27,7 +27,21 @@
         {% if user.is_authenticated %}
         <div class="ui right inverted teal menu">
           
-          <a href="{% url 'user_profile' user %}" class="item" > <i class="user circle outline link icon"></i>{{ request.user.username }}
+          <a href="{% url 'user_profile' request.user.username %}" class="item" >
+
+          {% if not user.profile.avatar %}
+
+              {% if user.profile.get_gender_display == "Male" %}
+              <img src="{% static 'img/matthew.png'%}" class="ui small circular image centered" style="width: 35px;height: 35px">
+              {% elif user.profile.get_gender_display == "Female" %}
+              <img src="{% static 'img/molly.png'%}" class="ui small circular image centered" style="width: 35px;height: 35px">
+              {%endif%}
+
+          {% else %}
+              <img src="{{ user.profile.avatar.url }}" class="ui small circular image centered" style="width: 35px;height: 35px">
+               <br /> <br />
+          {% endif %}
+            &nbsp; {{ request.user.get_full_name }}
           </a>
           
           
