@@ -179,12 +179,13 @@ class ApprovalView(TemplateView):
         raise NotImplementedError
 
 
-def view_profile(request, pk=None):
-    if pk:
-        user = get_object_or_404(User, pk=pk)
+def view_profile(request, username=None):
+    if User.objects.filter(username=username).exists():
+        user = User.objects.get(username=username)
+        return render(request, 'registration/user_profile.html', {'user': user})
     else:
-        user = request.user
-    return render(request, 'registration/user_profile.html', {'user': user})
+        return render(request, 'registration/user_not_found.html',{'username':username})
+    
 
 
 def edit_profile(request):
@@ -194,7 +195,7 @@ def edit_profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return redirect('user_profile')
+            return redirect('user_profile',username=request.user.username)
     else:
         user_form = UserForm(instance=request.user)
         profile_form = ProfileForm(instance=request.user.profile)

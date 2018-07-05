@@ -27,7 +27,7 @@
         {% if user.is_authenticated %}
         <div class="ui right inverted teal menu">
           
-          <a href="{% url 'user_profile' %}" class="item" > <i class="user circle outline link icon"></i>{{ request.user.username }}
+          <a href="{% url 'user_profile' user %}" class="item" > <i class="user circle outline link icon"></i>{{ request.user.username }}
           </a>
           
           

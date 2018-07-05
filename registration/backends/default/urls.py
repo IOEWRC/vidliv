@@ -47,7 +47,7 @@ urlpatterns = [
     url(r'^register/closed/$',
         TemplateView.as_view(template_name='registration/registration_closed.html'),
         name='registration_disallowed'),
-    url(r'^profile', view_profile, name='user_profile'),
+    # url(r'^profile', view_profile, name='user_profile'),
     url(r'^edit-profile', edit_profile, name='edit_profile'),
 ]
 
