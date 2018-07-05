@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title_name %}VidLIV: Home{% endblock %}
+{% comment %} {% block title_name %}VidLIV: Home{% endblock %} {% endcomment %}
 
 {% block script %}
     <script src="{% static 'home/js/pubnub.js' %}"></script>
@@ -94,20 +94,23 @@
 
 {% block content %}
     <div class="ui container">
-    <p><h1>Welcome to VidLIV</h1></p>
-    <p>Coming soon</p>
+    <p><h1>Welcome to VidliV</h1></p>
+   
     <div id="userList">
     <table class="ui teal table">
         <thead>
         <tr>
-            <td>users</td>
-            <td>actions</td>
+            <td>Friends</td>
+            <td>Actions</td>
         </tr>
         </thead>
         <tbody>
         {% for usr in user_list %}
             <tr>
-            <td>{{ usr.username }}</td>
+            <td><div class='name'><a href="{% url 'user_profile' usr %}" >{{ usr.get_full_name }}</a></div>
+                
+                <div>@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
+            </td>
             <td>
                 <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
             </td>

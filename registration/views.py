@@ -35,7 +35,7 @@ class RegistrationView(FormView):
     @method_decorator(sensitive_post_parameters('password1', 'password2'))
     def dispatch(self, request, *args, **kwargs):
         """
-        Check that user signup is allowed and if user is logged in before even bothering to
+        Check that user signup is allowed and if user is logged in before even borthering to
         dispatch or do other processing.
 
         """
@@ -184,8 +184,7 @@ def view_profile(request, username=None):
         user = User.objects.get(username=username)
         return render(request, 'registration/user_profile.html', {'user': user})
     else:
-        return render(request, 'registration/user_not_found.html',{'username':username})
-    
+        return render(request, 'registration/user_not_found.html', {'username': username})
 
 
 def edit_profile(request):
@@ -195,7 +194,7 @@ def edit_profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return redirect('user_profile',username=request.user.username)
+            return redirect('user_profile', username=request.user.username)
     else:
         user_form = UserForm(instance=request.user)
         profile_form = ProfileForm(instance=request.user.profile)
