@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title_name %}VidLIV: Home{% endblock %}
+{% comment %} {% block title_name %}VidLIV: Home{% endblock %} {% endcomment %}
 
 {% block script %}
     <script src="{% static 'home/js/pubnub.js' %}"></script>
@@ -110,7 +110,7 @@
 
 {% block content %}
         <div class="ui container">
-            <p><h1>Welcome to VidLIV</h1></p>
+            <p><h1>Welcome to VidliV</h1></p>
             <a href="{% url 'home:golive'%}" class="ui red button"><i class="video icon"></i>GoLive</a>
         </div>
         <hr>
@@ -128,14 +128,20 @@
                                  <tr>
                                   <td>
                                     <h4 class="ui image header">
-                                        {% if usr.profile.avatar %}
-                                            <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image">
-                                        {% else %}
+                                            {% if not user.profile.avatar %}
+                                            {% if user.profile.get_gender_display == "Male" %}
                                             <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
-                                        {% endif %}
-                                        <div class="content">
-                                            <a href='{% url "user_profile_other" username=usr.username %}'>{{ usr.username }}</a>
-                                        </div>
+                                            {% elif user.profile.get_gender_display == "Female" %}
+                                            <img src="{% static 'img/molly.png' %}" class="ui mini rounded image">
+                                            {%endif%}
+                                            
+                                            {% else %}
+                                                <img src="{{ user.profile.avatar.url }}" class="ui mini rounded image" >
+                                                 <br /> <br />
+                                            {% endif %}
+                                        <div class='name'><a href="{% url 'user_profile' usr %}" >{{ usr.get_full_name }}</a></div>
+                
+                                        <div>@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
                                   </h4></td>
                                   <td>
                                     <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
@@ -162,14 +168,20 @@
                                  <tr>
                                   <td>
                                     <h4 class="ui image header">
-                                        {% if usr.profile.avatar %}
-                                            <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image">
-                                        {% else %}
+                                            {% if not user.profile.avatar %}
+                                            {% if user.profile.get_gender_display == "Male" %}
                                             <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
-                                        {% endif %}
-                                        <div class="content">
-                                            <a href='{% url "user_profile_other" username=usr.username %}'>{{ usr.username }}</a>
-                                        </div>
+                                            {% elif user.profile.get_gender_display == "Female" %}
+                                            <img src="{% static 'img/molly.png' %}" class="ui mini rounded image">
+                                            {%endif%}
+
+                                            {% else %}
+                                                <img src="{{ user.profile.avatar.url }}" class="ui mini rounded image" >
+                                                 <br /> <br />
+                                            {% endif %}
+                                        <div class='name'><a href="{% url 'user_profile' usr %}" >{{ usr.get_full_name }}</a></div>
+                
+                                        <div>@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
                                   </h4></td>
                                   <td>
                                     <button type="button" class="ui red button" onclick="watchLive('{{ usr.username }}', '{% url "home:watchlive" username=usr.username %}')"><i class="play icon"></i>WatchLive</button>

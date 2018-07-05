@@ -1,0 +1,22 @@
+<!-- this is the markup. you can change the details (your own name, your own avatar etc.) but don’t change the basic structure! -->
+{% extends "registration/registration_base.html" %}
+{% load static %}
+{% block title %}{{ username }} not found{% endblock %}
+{% block stylesheet %}
+    <link rel="stylesheet" href="{% static 'registration/css/user_profile.css' %}">
+{% endblock %}
+{% block content %}
+    <div class="ui container main">
+    <div class="destacados ui two column centered grid">
+            <div class="box1">
+                    
+                     <br /> <br />
+
+              <h3>{{ username }} Not Found</h3>
+              <h2 style="color:teal;">Try Searching The User</h2>
+              
+           
+            </div>
+        </div>
+    </div>
+{% endblock %}

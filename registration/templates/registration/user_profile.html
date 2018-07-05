@@ -10,18 +10,24 @@
     <div class="destacados ui two column centered grid">
             <div class="box1">
                 {% if not user.profile.avatar %}
-                    <img src="{% static 'img/matthew.png' %}" class="ui small circular image centered">
+                {% if user.profile.get_gender_display == "Male" %}
+                <img src="{% static 'img/matthew.png' %}" class="ui small circular image centered">
+                {% elif user.profile.get_gender_display == "Female" %}
+                <img src="{% static 'img/molly.png' %}" class="ui small circular image centered">
+                {%endif%}
+                    
+                   
                 {% else %}
                     <img src="{{ user.profile.avatar.url }}" class="ui small circular image centered" style="width: 100px;height: 100px">
                      <br /> <br />
                 {% endif %}
 
               <h3>{{ user.get_full_name }}</h3>
-            <h4 style="color:teal">Username: {{ user.username }}</h4>
-            <h4 style="color:teal">Location: {{ user.profile.location }}</h4>
-            <h4 style="color:teal">Phone No.: {{ user.profile.phone_number }}</h4>
-            <h4 style="color:teal">Gender: {{ user.profile.get_gender_display }}</h4>
-            <h4 style="color:teal">About Me: {{ user.profile.about_me }}</h4>
+            <h4 style="color:teal">Username :&nbsp;{{ user.username }}</h4>
+            <h4 style="color:teal">Location :&nbsp; {{ user.profile.location }}</h4>
+            <h4 style="color:teal">Phone No. :&nbsp; {{ user.profile.phone_number }}</h4>
+            <h4 style="color:teal">Gender :&nbsp; {{ user.profile.get_gender_display }}</h4>
+            <h4 style="color:teal">About Me :<div>{{ user.profile.about_me }}</div></h4>
             <hr>
             {% if request.user is user %}
                 <a class="ui button teal" href="{% url 'edit_profile' %}" ><span>Update Profile</span></a>

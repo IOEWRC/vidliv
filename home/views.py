@@ -66,12 +66,12 @@ def get_username(request):
             if user.profile.avatar:
                 profile_image = user.profile.avatar.url
             else:
-                profile_image = static('img/matthew.png')
+                profile_image = static('img/matthew.png') #TODO:show according to gender
             username_json = {
                 'username': user.username,
                 'fullname': user.get_full_name(),
                 'profile_image': profile_image,
-                'profile_url': reverse('user_profile_other', kwargs={'username': user.username})
+                'profile_url': reverse('user_profile', kwargs={'username': user.username})
             }
             results['results'].append(username_json)
         return JsonResponse(results)

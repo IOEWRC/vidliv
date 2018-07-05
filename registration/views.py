@@ -36,7 +36,7 @@ class RegistrationView(FormView):
     @method_decorator(sensitive_post_parameters('password1', 'password2'))
     def dispatch(self, request, *args, **kwargs):
         """
-        Check that user signup is allowed and if user is logged in before even bothering to
+        Check that user signup is allowed and if user is logged in before even borthering to
         dispatch or do other processing.
 
         """
@@ -181,15 +181,14 @@ class ApprovalView(TemplateView):
 
 
 def view_profile(request, username=None):
-    if request.user.username == username:
-        return redirect('user_profile_self')
-    if username:
-        user = get_object_or_404(User, username=username)
-    else:
-        user = request.user
     friend, created = Friend.objects.get_or_create(current_user=request.user)
     friends = friend.friend_list.all()
-    return render(request, 'registration/user_profile.html', {'user': user, 'friends': friends})
+    if User.objects.filter(username=username).exists():
+        user = User.objects.get(username=username)
+        return render(request, 'registration/user_profile.html', {'user': user, 'friends': friends})
+    else:
+        return render(request, 'registration/user_not_found.html', {'username': username})
+
 
 
 def edit_profile(request):
@@ -199,7 +198,7 @@ def edit_profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return redirect('user_profile')
+            return redirect('user_profile', username=request.user.username)
     else:
         user_form = UserForm(instance=request.user)
         profile_form = ProfileForm(instance=request.user.profile)
