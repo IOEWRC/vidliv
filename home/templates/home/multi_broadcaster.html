@@ -80,6 +80,7 @@
                 connection.dontCaptureUserMedia = true;
                 connection.session.oneway = true;
             }
+            callback();
         }
 
         function afterConnectingSocket() {
@@ -116,7 +117,7 @@
             var broadcaster = true;
 
             beforeJoiningARoom(() => {
-                connection.open('{{ roomId }}', (isRoomExist, roomid) => {
+                connection.openOrJoin('{{ roomid }}', (isRoomExist, roomid) => {
                    afterConnectingSocket();
                 });
             });
