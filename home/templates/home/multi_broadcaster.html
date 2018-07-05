@@ -1,15 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block stylesheet %}
-    <link rel="stylesheet" href="{% static 'home/css/getHTMLMediaElement.css' %}">
-{% endblock %}
 
 {% block script %}
     <script src="{% static 'home/js/RTCMultiConnection.js' %}"></script>
     <script src="{% static 'home/js/adapter.js' %}"></script>
     <script src="{% static 'home/js/socket.io.js' %}"></script>
-    <script src="{% static 'home/js/getHTMLMediaElement.js' %}"></script>
     <script type="text/javascript">
         var connection = new RTCMultiConnection();
 
@@ -31,21 +27,7 @@
         connection.videosContainer = document.getElementById('videos-container');
 
         connection.onstream = function(event) {
-            var width = parseInt(connection.videosContainer.clientWidth / 2) - 20;
-            var mediaElement = getHTMLMediaElement(event.mediaElement, {
-                title: event.userid,
-                buttons: ['full-screen'],
-                width: width,
-                showOnMouseEnter: false
-            });
-
-            connection.videosContainer.appendChild(mediaElement);
-
-            setTimeout(function() {
-                mediaElement.media.play();
-            }, 5000);
-
-            mediaElement.id = event.streamid;
+            connection.videosContainer.appendChild(event.mediaElement);
 
             if (event.type === 'remote' && connection.isInitiator) {
                 var participants = [];
@@ -84,34 +66,34 @@
         }
 
         function afterConnectingSocket() {
-        connection.socket.on(connection.socketCustomEvent, function(message) {
-            console.error('custom message', message);
+            connection.socket.on(connection.socketCustomEvent, function(message) {
+                console.error('custom message', message);
 
-            if (message.participants && !connection.isInitiator) {
-                message.participants.forEach(function(participant) {
-                    if (participant.pid === connection.userid) return;
-                    if (connection.getAllParticipants().indexOf(participant.pid) !== -1) return;
-                    if (broadcaster === true && participant.broadcaster === false) return;
+                if (message.participants && !connection.isInitiator) {
+                    message.participants.forEach(function(participant) {
+                        if (participant.pid === connection.userid) return;
+                        if (connection.getAllParticipants().indexOf(participant.pid) !== -1) return;
+                        if (broadcaster === true && participant.broadcaster === false) return;
 
-                    console.error('I am joining:', participant.pid);
-                    connection.join(participant.pid);
-                });
-            }
-
-            if (message.giveAllParticipants && connection.isInitiator) {
-                var participants = [];
-                connection.getAllParticipants().forEach(function(pid) {
-                    participants.push({
-                        pid: pid,
-                        broadcaster: connection.peers[pid].extra.broadcaster === true
+                        console.error('I am joining:', participant.pid);
+                        connection.join(participant.pid);
                     });
-                });
-                connection.socket.emit(connection.socketCustomEvent, {
-                    participants: participants
-                });
-            }
-        });
-    }
+                }
+
+                if (message.giveAllParticipants && connection.isInitiator) {
+                    var participants = [];
+                    connection.getAllParticipants().forEach(function(pid) {
+                        participants.push({
+                            pid: pid,
+                            broadcaster: connection.peers[pid].extra.broadcaster === true
+                        });
+                    });
+                    connection.socket.emit(connection.socketCustomEvent, {
+                        participants: participants
+                    });
+                }
+            });
+        }
 
         {% if broadcaster %}
             var broadcaster = true;
