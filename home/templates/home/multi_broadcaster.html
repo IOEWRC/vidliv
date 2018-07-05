@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block stylesheet %}
+    <link rel="stylesheet" href="{% static 'home/css/getHTMLMediaElement.css' %}">
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'home/js/RTCMultiConnection.js' %}"></script>
+    <script src="{% static 'home/js/adapter.js' %}"></script>
+    <script src="{% static 'home/js/socket.io.js' %}"></script>
+    <script src="{% static 'home/js/getHTMLMediaElement.js' %}"></script>
+    <script type="text/javascript">
+        var connection = new RTCMultiConnection();
+
+        connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
+
+        connection.socketMessageEvent = 'VidLIVE-RTCMulticonnection';
+
+        connection.session = {
+            audio: true,
+            video: true,
+            broadcast: true
+        };
+
+        connection.sdpConstraints.mandatory = {
+            OfferToReceiveAudio: true,
+            OfferToReceiveVideo: true,
+        };
+
+        connection.videosContainer = document.getElementById('videos-container');
+
+        connection.onstream = function(event) {
+            var width = parseInt(connection.videosContainer.clientWidth / 2) - 20;
+            var mediaElement = getHTMLMediaElement(event.mediaElement, {
+                title: event.userid,
+                buttons: ['full-screen'],
+                width: width,
+                showOnMouseEnter: false
+            });
+
+            connection.videosContainer.appendChild(mediaElement);
+
+            setTimeout(function() {
+                mediaElement.media.play();
+            }, 5000);
+
+            mediaElement.id = event.streamid;
+
+            if (event.type === 'remote' && connection.isInitiator) {
+                var participants = [];
+                connection.getAllParticipants().forEach(function(pid) {
+                    participants.push({
+                        pid: pid,
+                        broadcaster: connection.peers[pid].extra.broadcaster === true
+                    });
+                });
+                connection.socket.emit(connection.socketCustomEvent, {
+                    participants: participants
+                });
+            } else if (event.type === 'remote' && broadcaster === false) {
+                connection.socket.emit(connection.socketCustomEvent, {
+                    giveAllParticipants: true
+                });
+            }
+        };
+
+        connection.onstreamended = function(event) {
+            var mediaElement = document.getElementById(event.streamid);
+            if (mediaElement) {
+                mediaElement.parentNode.removeChild(mediaElement);
+            }
+        };
+
+        function beforeJoiningARoom(callback) {
+            if (broadcaster) {
+                connection.extra.broadcaster = true;
+            } else {
+                connection.extra.broadcaster = false;
+                connection.dontCaptureUserMedia = true;
+                connection.session.oneway = true;
+            }
+        }
+
+        function afterConnectingSocket() {
+        connection.socket.on(connection.socketCustomEvent, function(message) {
+            console.error('custom message', message);
+
+            if (message.participants && !connection.isInitiator) {
+                message.participants.forEach(function(participant) {
+                    if (participant.pid === connection.userid) return;
+                    if (connection.getAllParticipants().indexOf(participant.pid) !== -1) return;
+                    if (broadcaster === true && participant.broadcaster === false) return;
+
+                    console.error('I am joining:', participant.pid);
+                    connection.join(participant.pid);
+                });
+            }
+
+            if (message.giveAllParticipants && connection.isInitiator) {
+                var participants = [];
+                connection.getAllParticipants().forEach(function(pid) {
+                    participants.push({
+                        pid: pid,
+                        broadcaster: connection.peers[pid].extra.broadcaster === true
+                    });
+                });
+                connection.socket.emit(connection.socketCustomEvent, {
+                    participants: participants
+                });
+            }
+        });
+    }
+
+        {% if broadcaster %}
+            var broadcaster = true;
+
+            beforeJoiningARoom(() => {
+                connection.open('{{ roomId }}', (isRoomExist, roomid) => {
+                   afterConnectingSocket();
+                });
+            });
+        {% else %}
+            var broadcaster = false;
+
+            function joinBroadcastLooper(roomid) {
+                (function reCheckRoomPresence() {
+                    connection.checkPresence(roomid, isRoomExist => {
+                        if (isRoomExist) {
+                            beforeJoiningARoom(() => {
+                                connection.join(roomid, () => {
+                                    afterConnectingSocket();
+                                });
+                            });
+                            return;
+                        }
+                        setTimeout(reCheckRoomPresence, 5000);
+                    });
+                })();
+            }
+
+            joinBroadcastLooper('{{ roomid }}');
+        {% endif %}
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div id="videos-container"></div>
+{% endblock %}
