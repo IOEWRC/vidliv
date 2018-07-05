@@ -7,6 +7,11 @@
     <script src="{% static 'home/js/webrtc.js' %}"></script>
     <script src="{% static 'home/js/rtc-controller.js' %}"></script>
     <script type="text/javascript">
+        {% if messages %}
+            {% for message in messages %}
+                generalModalFunction('{{ message.extra_tags }}', '{{ message }}');
+            {% endfor %}
+        {% endif %}
         const video_out = document.getElementById('vid-box');
         const vid_thumb = document.getElementById('vid-thumb');
         const phone = window.phone = PHONE({
@@ -47,7 +52,9 @@
                     }).modal('show');
                     ctrl.dial(username);
                 }
-                else alert(username + ' is offline');
+                else {
+                    generalModalFunction(username + ' status', username + ' is OFFLINE!!!');
+                }
             });
         }
         $('#endCallButton').click(() => {
@@ -89,33 +96,131 @@
                 ctrl.unsubscribe();
             }
         });
+        function watchLive(username, url) {
+            ctrl.isStreaming(username, isOn =>{
+               if (isOn) {console.log('a');
+                   window.location.replace(window.location.protocol + '//' + window.location.host + url);}
+               else {
+                   generalModalFunction(username + ' streaming status', username + ' is not streaming !!!');
+               }
+            });
+        }
     </script>
 {% endblock %}
 
 {% block content %}
-    <p><h1>Welcome to VidLIV</h1></p>
-    <p>Coming soon</p>
-    <a class="ui teal button" href="{% url 'home:golive' %}">Go Live</a>
-    <div id="userList">
-    <table class="ui teal table">
-        <thead>
-        <tr>
-            <td>users</td>
-            <td>actions</td>
-        </tr>
-        </thead>
-        <tbody>
-        {% for usr in user_list %}
-            <tr>
-            <td>{{ usr.username }}</td>
-            <td>
-                <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
-                <a class="ui inverted teal button" href="{% url 'home:watchlive' username=usr.username %}">Watch Live</a>
-            </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    </div>
-    {% block call %}{% include 'home/call.html' %}{% endblock %}
+        <div class="ui container">
+            <p><h1>Welcome to VidLIV</h1></p>
+            <a href="{% url 'home:golive'%}" class="ui red button"><i class="video icon"></i>GoLive</a>
+        </div>
+        <hr>
+        <div class="ui stackable grid container">
+            <div class="eight wide column">
+                    <div id="userList" class="tableContainer">
+                        <table class="ui teal table green scrollTable">
+                      <thead class="fixedHeader">
+                        <tr><th>Friends</th>
+                        <th></th>
+                      </tr></thead>
+                      <tbody class="scrollContent">
+                        {% if view.friend_list %}
+                            {% for usr in view.friend_list %}
+                                 <tr>
+                                  <td>
+                                    <h4 class="ui image header">
+                                        {% if usr.profile.avatar %}
+                                            <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image">
+                                        {% else %}
+                                            <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
+                                        {% endif %}
+                                        <div class="content">
+                                            <a href='{% url "user_profile_other" username=usr.username %}'>{{ usr.username }}</a>
+                                        </div>
+                                  </h4></td>
+                                  <td>
+                                    <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
+                                  </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <p>No Friends to call !!!. Add some friends first.</p>
+                        {% endif %}
+                      </tbody>
+                    </table>
+                    </div>
+            </div>
+            <div class="eight wide column">
+                    <div id="userList1" class="tableContainer">
+                        <table class="ui teal table green scrollTable">
+                      <thead class="fixedHeader">
+                        <tr><th>Streamers</th>
+                        <th></th>
+                      </tr></thead>
+                      <tbody class="scrollContent">
+                        {% if view.friend_list %}
+                            {% for usr in view.friend_list %}
+                                 <tr>
+                                  <td>
+                                    <h4 class="ui image header">
+                                        {% if usr.profile.avatar %}
+                                            <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image">
+                                        {% else %}
+                                            <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
+                                        {% endif %}
+                                        <div class="content">
+                                            <a href='{% url "user_profile_other" username=usr.username %}'>{{ usr.username }}</a>
+                                        </div>
+                                  </h4></td>
+                                  <td>
+                                    <button type="button" class="ui red button" onclick="watchLive('{{ usr.username }}', '{% url "home:watchlive" username=usr.username %}')"><i class="play icon"></i>WatchLive</button>
+                                  </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <p>No Friends to watch stream !!!. Add some friends first.</p>
+                        {% endif %}
+                      </tbody>
+                    </table>
+                    </div>
+            </div>
+        </div>
+<div><br></div>
+    {% block call %}{% include 'home/call.html' %}{% include 'home/base.html' %}{% endblock %}
+{% endblock %}
+{% block stylesheet %}
+    <style>
+        div.tableContainer {
+	border: 1px solid #963;
+	overflow: auto;
+}
+
+    /* Reset overflow value to hidden for all non-IE browsers. */
+    html>body div.tableContainer {
+        overflow: hidden;
+        {#width: 900px#}
+        }
+
+    /* define width of table. IE browsers only                 */
+    div.tableContainer table {
+        float: left;
+        width: 740px
+    }
+
+    thead.fixedHeader tr {
+        position: relative;
+    }
+
+    html>body tbody.scrollContent {
+        display: block;
+        height: 350px;
+        overflow: auto;
+        width: 100%
+    }
+
+    html>body thead.fixedHeader {
+        display: table;
+        overflow: auto;
+        width: 100%
+    }
+    </style>
 {% endblock %}

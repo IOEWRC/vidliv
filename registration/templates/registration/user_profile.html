@@ -23,8 +23,15 @@
             <h4 style="color:teal">Gender: {{ user.profile.get_gender_display }}</h4>
             <h4 style="color:teal">About Me: {{ user.profile.about_me }}</h4>
             <hr>
-            <button class="ui button teal" href="#"><span>Call </span></button>
-                <button class="ui button teal" href="{% url 'edit_profile' %}" ><span>Update Profile</span></button>
+            {% if request.user is user %}
+                <a class="ui button teal" href="{% url 'edit_profile' %}" ><span>Update Profile</span></a>
+            {% else %}
+                {% if user in friends %}
+                <a class="ui button teal" href="{% url 'home:friendOperation' operation='unfriend' pk=user.pk %}"><span><i class="minus circle icon"></i>Unfriend</span></a>
+                {% else %}
+                    <a class="ui button teal" href="{% url 'home:friendOperation' operation='addfriend' pk=user.pk %}"><span><i class="plus circle icon"></i>Friend</span></a>
+                {% endif %}
+            {% endif %}
                 <br><hr>
             </div>
         </div>

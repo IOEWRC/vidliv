@@ -16,10 +16,11 @@
         });
         var ctrl = window.ctrl = CONTROLLER(phone, get_xirsys_servers);
         ctrl.ready(() => {
-            
             ctrl.isStreaming(streamName, isOn => {
                 if (isOn) ctrl.joinStream(streamName);
-                else alert(streamName + ' is not streaming!');
+                else {
+                    generalModalFunction(streamName + ' streaming status', streamName + ' is not streaming !!!');
+                }
             });
         });
         ctrl.receive(session => {
@@ -30,7 +31,7 @@
             session.ended(session => {
                 if (session.number === streamName) {
                     // TODO add message 'streaming ended'
-                    window.location.replace(window.location.protocol + '//' + window.location.host + '{% url "home:home" %}');
+                    window.location.replace(window.location.protocol + '//' + window.location.host + "{% url 'home:home' %}");
                 }
             });
         });
@@ -59,7 +60,7 @@
         });
         var ht= 0.5 * screen.height;
         var wd = 0.6 * window.width;
-        $('#vid-box').css({'width': wd,'height':ht})
+        $('#vid-box').css({'width': wd,'height':ht});
 
         $('#enterEvent').keypress(function(e) {
             if(e.which == 13) {
@@ -75,6 +76,9 @@
             var elem = document.getElementById('chat-box');
             elem.scrollTop = elem.scrollHeight;
           }, 0.00000000001);
+        $('#okButton').click(()=>{
+            window.location.replace(window.location.protocol + '//' + window.location.host + '{% url "home:home" %}');
+        });
     </script>
     <style>
             #chat-box{
@@ -99,11 +103,12 @@
 <div class="ui stackable two column grid container">
         <div class="column">
             <div class="ui inverted segment" id="vid-box">
-                <div id="loading" class="ui active inverted loader"></div>                   
-                   
-            </div>  
+                <div id="loading" class="ui active inverted loader"></div>
+
+            </div>
             <button class="ui inverted red button" id="leaveStreamButton">Leave</button>
         </div>
+<<<<<<< HEAD
         <div class="column"> 
                 <div class="ui header">Live Chat</div> 
 
@@ -120,5 +125,17 @@
                 </div>
         </div>  
         
+=======
+
+        <div class="column">
+            <h5 class="ui header">Live Chat</h5>
+            <div class="ui chatroom" id="chatbox">
+                <div class="ui fluid action input">
+                    <input placeholder="Chat..." type="text">
+                </div>
+            </div>
+        </div>
+>>>>>>> 2e2b98b733062cb2ce43ea88b1839da14f725a86
 </div>
+    {% block call %}{% include 'home/base.html' %}{% endblock %}
 {% endblock %}
