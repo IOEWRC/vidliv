@@ -128,15 +128,15 @@
                                  <tr>
                                   <td>
                                     <h4 class="ui image header">
-                                            {% if not user.profile.avatar %}
-                                            {% if user.profile.get_gender_display == "Male" %}
+                                            {% if not usr.profile.avatar %}
+                                            {% if usr.profile.get_gender_display == "Male" %}
                                             <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
-                                            {% elif user.profile.get_gender_display == "Female" %}
+                                            {% elif usr.profile.get_gender_display == "Female" %}
                                             <img src="{% static 'img/molly.png' %}" class="ui mini rounded image">
                                             {%endif%}
                                             
                                             {% else %}
-                                                <img src="{{ user.profile.avatar.url }}" class="ui mini rounded image" >
+                                                <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image" >
                                                  <br /> <br />
                                             {% endif %}
                                         <div class='name'><a href="{% url 'user_profile' usr %}" >{{ usr.get_full_name }}</a></div>
@@ -168,15 +168,15 @@
                                  <tr>
                                   <td>
                                     <h4 class="ui image header">
-                                            {% if not user.profile.avatar %}
-                                            {% if user.profile.get_gender_display == "Male" %}
+                                            {% if not usr.profile.avatar %}
+                                            {% if usr.profile.get_gender_display == "Male" %}
                                             <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
-                                            {% elif user.profile.get_gender_display == "Female" %}
+                                            {% elif usr.profile.get_gender_display == "Female" %}
                                             <img src="{% static 'img/molly.png' %}" class="ui mini rounded image">
                                             {%endif%}
 
                                             {% else %}
-                                                <img src="{{ user.profile.avatar.url }}" class="ui mini rounded image" >
+                                                <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image" >
                                                  <br /> <br />
                                             {% endif %}
                                         <div class='name'><a href="{% url 'user_profile' usr %}" >{{ usr.get_full_name }}</a></div>
