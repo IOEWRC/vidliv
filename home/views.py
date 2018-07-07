@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.http import Http404
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.db.models import Q
 from .models import Friend
@@ -89,12 +89,16 @@ def multi_broadcast(request, action=None, username=None):
             'roomInitiator': True,
         })
     elif username and action == 'view':
+        if username == request.user.username:
+            return redirect('home:gomultibroadcast')
         return render(request, 'home/multi_broadcaster.html', {
             'broadcaster': False,
             'roomid': username + '-stream_room',
             'roomInitiator': False,
         })
     elif username and action == 'join':
+        if username == request.user.username:
+            return redirect('home:gomultibroadcast')
         return render(request, 'home/multi_broadcaster.html', {
             'broadcaster': True,
             'roomid': username + '-stream_room',

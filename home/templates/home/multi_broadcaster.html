@@ -104,11 +104,19 @@
             });
         }
 
-        {% if broadcaster %}
+        {% if broadcaster and roomInitiator%}
             var broadcaster = true;
 
             beforeJoiningARoom(() => {
-                connection.openOrJoin('{{ roomid }}', (isRoomExist, roomid) => {
+                connection.open('{{ roomid }}', (isRoomExist, roomid) => {
+                   afterConnectingSocket();
+                });
+            });
+        {% elif broadcaster and not roomInitiator %}
+            var broadcaster = true;
+
+            beforeJoiningARoom(() => {
+                connection.join('{{ roomid }}', (isRoomExist, roomid) => {
                    afterConnectingSocket();
                 });
             });
