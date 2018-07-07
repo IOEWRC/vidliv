@@ -86,15 +86,18 @@ def multi_broadcast(request, action=None, username=None):
         return render(request, 'home/multi_broadcaster.html', {
             'broadcaster': True,
             'roomid': request.user.username + '-stream_room',
+            'roomInitiator': True,
         })
     elif username and action == 'view':
         return render(request, 'home/multi_broadcaster.html', {
             'broadcaster': False,
             'roomid': username + '-stream_room',
+            'roomInitiator': False,
         })
     elif username and action == 'join':
         return render(request, 'home/multi_broadcaster.html', {
             'broadcaster': True,
             'roomid': username + '-stream_room',
+            'roomInitiator': False,
         })
     raise Http404

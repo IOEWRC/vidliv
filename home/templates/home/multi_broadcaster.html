@@ -19,6 +19,11 @@
             broadcast: true
         };
 
+        connection.extra = {
+            username: '{{ request.user.username }}',
+            roomInitiator:{% if roomInitiator %} true {% else %} false {% endif %}
+        };
+
         connection.sdpConstraints.mandatory = {
             OfferToReceiveAudio: true,
             OfferToReceiveVideo: true,
@@ -48,6 +53,10 @@
         };
 
         connection.onstreamended = function(event) {
+            if (event.extra.roomInitiator) {
+                // TODO popup initiator left message
+                window.location.replace(window.location.protocol + '//' + window.location.host + {% url 'home:home' %})
+            }
             var mediaElement = document.getElementById(event.streamid);
             if (mediaElement) {
                 mediaElement.parentNode.removeChild(mediaElement);
@@ -124,9 +133,21 @@
 
             joinBroadcastLooper('{{ roomid }}');
         {% endif %}
+        $('#multiBroadcastEndButton').click(() => {
+            if (connection.isInitiator) {
+                var leave = confirm('You are the initiator of room. Do you want to close room?');
+            }
+            else
+                var leave = confirm('Are you sure to leave room?');
+            if (leave) {
+                connection.leave();
+                window.location.replace(window.location.protocol + '//' + window.location.host + '{% url 'home:home' %}');
+            }
+        });
     </script>
 {% endblock %}
 
 {% block content %}
     <div id="videos-container"></div>
+    <button class="ui inverted red button" id="multiBroadcastEndButton">End</button>
 {% endblock %}
