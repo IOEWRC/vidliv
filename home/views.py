@@ -40,7 +40,7 @@ def broadcast_view(request, username=None):
     pnconfig.publish_key = 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792'
     pnconfig.ssl = True
 
-    pubnub =PubNub(pnconfig)
+    pubnub = PubNub(pnconfig)
     envelope = pubnub.where_now().uuid(username + '-device').sync()
     if username + '-stream' not in envelope.result.channels:
         messages.info(request, username + ' is not streaming', extra_tags=username + ' status')
@@ -51,11 +51,12 @@ def broadcast_view(request, username=None):
 
 def friend_operation(request, operation, pk):
     new_friend = User.objects.get(pk=pk)
-    if operation == 'addfriend':
-        Friend.add_friend(request.user, new_friend)
-    elif operation == 'unfriend':
-        Friend.unfriend(request.user, new_friend)
-    return redirect('home:home')
+    if new_friend != request.user:
+        if operation == 'addfriend':
+            Friend.add_friend(request.user, new_friend)
+        elif operation == 'unfriend':
+            Friend.unfriend(request.user, new_friend)
+    return redirect('user_profile', username=request.user.username)
 
 
 def get_username(request):
@@ -66,8 +67,7 @@ def get_username(request):
             users = User.objects.filter(
                 Q(username__icontains=q) | Q(
                     first_name__icontains=q) | Q(
-                        last_name__icontains=q))
-        #users = User.objects.filter(username__icontains=q)
+                    last_name__icontains=q))
         results = {'results': []}
         for user in users:
             profile_image = user.profile.get_avatar

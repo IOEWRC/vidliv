@@ -25,16 +25,11 @@
 
         {% if user.is_authenticated %}
         <div class="ui right inverted teal menu">
-          
           <a href="{% url 'user_profile' request.user.username %}" class="item" >
-
               <img src="{{ request.user.profile.get_avatar }}" class="ui small circular image" style="width: 35px;height: 35px">
-               <br /> <br />
-          {% endif %}
-            &nbsp; {{ request.user.get_full_name }}
-
+            &nbsp;{{ request.user.username }}
           </a>
-          
+
           
         <div class=" ui dropdown item"><i class="settings icon"></i>
           Settings
@@ -48,8 +43,9 @@
             <div class="divider"></div>
             <div class="header">{{ request.user.get_full_name }}</div>
           </div>
-          </div>
-          </div>
+        </div>
+        {% endif %}
+        </div>
         
     </div>
-    </div>
+  </div>

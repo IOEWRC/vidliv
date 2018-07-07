@@ -128,17 +128,17 @@
                                  <tr>
                                   <td>
                                     <h4 class="ui image header">
-                                            {% if not usr.profile.avatar %}
-                                            {% if usr.profile.get_gender_display == "Male" %}
-                                            <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
-                                            {% elif usr.profile.get_gender_display == "Female" %}
-                                            <img src="{% static 'img/molly.png' %}" class="ui mini rounded image">
-                                            {%endif%}
-                                            
-                                            {% else %}
-                                                <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image" >
-                                                 <br /> <br />
-                                            {% endif %}
+                                        {% if not usr.profile.avatar %}
+                                        {% if usr.profile.get_gender_display == "Male" %}
+                                        <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
+                                        {% elif usr.profile.get_gender_display == "Female" %}
+                                        <img src="{% static 'img/molly.png' %}" class="ui mini rounded image">
+                                        {%endif%}
+
+                                        {% else %}
+                                            <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image" >
+                                             <br /> <br />
+                                        {% endif %}
                                         <div class='name'><a href="{% url 'user_profile' usr %}" >{{ usr.get_full_name }}</a></div>
                 
                                         <div>@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
@@ -149,7 +149,7 @@
                                 </tr>
                             {% endfor %}
                         {% else %}
-                            <tr><td>No friends.. Add some friends to call them !!!</td></tr>
+                            <tr><td>No Followings to call !!!</td></tr>
                         {% endif %}
                       </tbody>
                     </table>
@@ -189,7 +189,7 @@
                                 </tr>
                             {% endfor %}
                         {% else %}
-                           <tr><td>No friends.. Add some friends to watch their stream !!!</td></tr>
+                           <tr><td>No followings to watch their stream !!!</td></tr>
                         {% endif %}
                       </tbody>
                     </table>
@@ -200,39 +200,5 @@
     {% block call %}{% include 'home/call.html' %}{% include 'home/base.html' %}{% endblock %}
 {% endblock %}
 {% block stylesheet %}
-    <style>
-        div.tableContainer {
-	border: 1px solid #963;
-	overflow: auto;
-}
-
-    /* Reset overflow value to hidden for all non-IE browsers. */
-    html>body div.tableContainer {
-        overflow: hidden;
-        {#width: 900px#}
-        }
-
-    /* define width of table. IE browsers only                 */
-    div.tableContainer table {
-        float: left;
-        width: 740px
-    }
-
-    thead.fixedHeader tr {
-        position: relative;
-    }
-
-    html>body tbody.scrollContent {
-        display: block;
-        height: 350px;
-        overflow: auto;
-        width: 100%
-    }
-
-    html>body thead.fixedHeader {
-        display: table;
-        overflow: auto;
-        width: 100%
-    }
-    </style>
+    <link rel="stylesheet" href="{% static 'home/css/scrollable-table.css' %}">
 {% endblock %}
