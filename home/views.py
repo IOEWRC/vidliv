@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
-from django.templatetags.static import static
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.contrib.auth.models import User
@@ -67,7 +66,6 @@ def get_username(request):
                 Q(username__icontains=q) | Q(
                     first_name__icontains=q) | Q(
                         last_name__icontains=q))
-        #users = User.objects.filter(username__icontains=q)
         results = {'results': []}
         for user in users:
             profile_image = user.profile.get_avatar
@@ -78,4 +76,32 @@ def get_username(request):
                 'profile_url': reverse('user_profile', kwargs={'username': user.username})
             }
             results['results'].append(username_json)
+        return JsonResponse(results)
+
+
+def get_followers(request):
+    if request.is_ajax():
+        # PubNub instance
+        pnconfig = PNConfiguration()
+        pnconfig.subscribe_key = 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda'
+        pnconfig.publish_key = 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792'
+        pnconfig.ssl = True
+        pubnub = PubNub(pnconfig)
+
+        friend = Friend.objects.get(current_user__username__exact=request.user.username)
+        followers = friend.friend_list.all()
+        results = {'results': []}
+        for follower in followers:
+            envelope = pubnub.where_now().uuid(follower.username + '-device').sync()
+            if follower.username in envelope.result.channels:
+                profile_image = follower.profile.get_avatar
+                follower_json = {
+                    'username': follower.username,
+                    'fullname': follower.get_full_name(),
+                    'profile_image': profile_image,
+                    'profile_url': reverse('user_profile', kwargs={'username': follower.username})
+                }
+                results['results'].append(follower_json)
+            else:
+                continue
         return JsonResponse(results)

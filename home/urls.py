@@ -11,4 +11,5 @@ urlpatterns = [
     path('broadcast/<str:username>/', views.broadcast_view, name='watchlive'),
     path('friends/<str:operation>/<int:pk>/', views.friend_operation, name='friendOperation'),
     path('api/get_username/', views.get_username, name='searchAutoComplete'),
+    path('api/get_followers/', views.get_followers, name='getFollowers'),
 ]

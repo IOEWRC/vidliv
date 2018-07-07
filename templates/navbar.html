@@ -24,32 +24,33 @@
         {% endif %}
 
         {% if user.is_authenticated %}
-        <div class="ui right inverted teal menu">
-          
-          <a href="{% url 'user_profile' request.user.username %}" class="item" >
+            <div class="ui right inverted teal menu">
 
-              <img src="{{ request.user.profile.get_avatar }}" class="ui small circular image" style="width: 35px;height: 35px">
-               <br /> <br />
-          {% endif %}
-            &nbsp; {{ request.user.get_full_name }}
+              <a href="{% url 'user_profile' request.user.username %}" class="item" >
 
-          </a>
+                  <img src="{{ request.user.profile.get_avatar }}" class="ui small circular image" style="width: 35px;height: 35px">
+                   <br /> <br />
+
+                &nbsp; {{ request.user.get_full_name }}
+
+              </a>
           
           
-        <div class=" ui dropdown item"><i class="settings icon"></i>
-          Settings
-          <div class="menu">
-            <a class="item" href="{%url 'auth_password_change' %}"> 
-              <i class="edit outline icon"></i>Change Password</a>
-            <a class="item" href="{%url 'edit_profile' %}">
-                <i class="edit icon"></i>Edit Profile</a>
-            <a class="item" href="{%url 'auth_logout' %}">
-                <i class="sign out alternate icon"></i>Log Out</a>
-            <div class="divider"></div>
-            <div class="header">{{ request.user.get_full_name }}</div>
-          </div>
-          </div>
-          </div>
+            <div class=" ui dropdown item"><i class="settings icon"></i>
+              Settings
+              <div class="menu">
+                <a class="item" href="{%url 'auth_password_change' %}">
+                  <i class="edit outline icon"></i>Change Password</a>
+                <a class="item" href="{%url 'edit_profile' %}">
+                    <i class="edit icon"></i>Edit Profile</a>
+                <a class="item" href="{%url 'auth_logout' %}">
+                    <i class="sign out alternate icon"></i>Log Out</a>
+                <div class="divider"></div>
+                <div class="header">{{ request.user.get_full_name }}</div>
+              </div>
+            </div>
+        </div>
+     {% endif %}
         
     </div>
     </div>

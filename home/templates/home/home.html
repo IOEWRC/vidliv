@@ -105,6 +105,29 @@
                }
             });
         }
+        function fetchFollowers(){
+            $.ajax({
+                type: "GET",
+                url: '{% url "home:getFollowers" %}',
+                success: (data)=>{
+                    var datas = data.results;
+                    console.log(datas);
+                    datas.forEach((follower)=>{
+                        {#console.log(follower);#}
+                        var header = $('#header');
+                        /*header.append("<img src='" + follower.profile_image +"'class='ui mini rounded image' >" +
+                        '<div>@<a href="' + follower.profile_url + '"class="username">'+ follower.username + '</a></div>');
+                        $('#callButton').append('<button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall(' + follower.username + ')">Call</button>'+ '<br>');*/
+                    })
+                },
+                complete: (data)=>{
+                    setTimeout(fetchFollowers, 15000);
+                }
+            })
+        }
+        $(document).ready(()=>{
+            setTimeout(fetchFollowers, 15000);
+        });
     </script>
 {% endblock %}
 
@@ -119,34 +142,25 @@
                     <div id="userList" class="tableContainer">
                         <table class="ui teal table green scrollTable">
                       <thead class="fixedHeader">
-                        <tr><th>Friends</th>
+                        <tr><th>Online Friends</th>
                         <th></th>
                       </tr></thead>
                       <tbody class="scrollContent">
                         {% if view.friend_list %}
                             {% for usr in view.friend_list %}
-                                 <tr>
-                                  <td>
-                                    <h4 class="ui image header">
-                                            {% if not usr.profile.avatar %}
-                                            {% if usr.profile.get_gender_display == "Male" %}
-                                            <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
-                                            {% elif usr.profile.get_gender_display == "Female" %}
-                                            <img src="{% static 'img/molly.png' %}" class="ui mini rounded image">
-                                            {%endif%}
-                                            
-                                            {% else %}
-                                                <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image" >
-                                                 <br /> <br />
-                                            {% endif %}
-                                        <div class='name'><a href="{% url 'user_profile' usr %}" >{{ usr.get_full_name }}</a></div>
-                
-                                        <div>@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
-                                  </h4></td>
-                                  <td>
-                                    <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
-                                  </td>
-                                </tr>
+                                <tr>
+                                    <td>
+                                        <h4 class="ui image header" id="header">
+                                            <img src="{{ usr.profile.get_avatar }}" class="ui mini rounded image" >
+    {#                                                 <br />#}
+                                            <div class='name'><a href="{% url 'user_profile' usr %}" >{{ usr.get_full_name }}</a></div>
+    {##}
+                                            <div>@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
+                                        </h4></td>
+                                      <td id="callButton">
+                                        <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
+                                      </td>
+                                    </tr>
                             {% endfor %}
                         {% else %}
                             <tr><td>No friends.. Add some friends to call them !!!</td></tr>
@@ -159,7 +173,7 @@
                     <div id="userList1" class="tableContainer">
                         <table class="ui teal table green scrollTable">
                       <thead class="fixedHeader">
-                        <tr><th>Streamers</th>
+                        <tr><th>Online Streamers</th>
                         <th></th>
                       </tr></thead>
                       <tbody class="scrollContent">
@@ -168,17 +182,7 @@
                                  <tr>
                                   <td>
                                     <h4 class="ui image header">
-                                            {% if not usr.profile.avatar %}
-                                            {% if usr.profile.get_gender_display == "Male" %}
-                                            <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
-                                            {% elif usr.profile.get_gender_display == "Female" %}
-                                            <img src="{% static 'img/molly.png' %}" class="ui mini rounded image">
-                                            {%endif%}
-
-                                            {% else %}
-                                                <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image" >
-                                                 <br /> <br />
-                                            {% endif %}
+                                        <img src="{{ usr.profile.get_avatar }}" class="ui mini rounded image" >
                                         <div class='name'><a href="{% url 'user_profile' usr %}" >{{ usr.get_full_name }}</a></div>
                 
                                         <div>@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
