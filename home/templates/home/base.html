@@ -14,10 +14,35 @@
   </div>
 </div>
 
+<div class="ui basic modal" id="confirmModal">
+  <div class="ui icon header">
+    <i class="archive icon"></i>
+      <p>Archive Old Messages</p>
+  </div>
+  <div class="content">
+    <p>Your inbox is getting full, would you like us to enable automatic archiving of old messages?</p>
+  </div>
+  <div class="actions">
+    <div class="ui red basic cancel inverted button" id="confirmModalNo">
+      <i class="remove icon"></i>
+      No
+    </div>
+    <div class="ui green ok inverted button" id="confirmModalYes">
+      <i class="checkmark icon"></i>
+      Yes
+    </div>
+  </div>
+</div>
+
 <script>
     function generalModalFunction(header, message) {
-        $('p#msg').html(message);
-        $('p#header').html(header);
+        $('#generalModal #msg').html(message);
+        $('#generalModal #header').html(header);
         $('#generalModal').modal('setting', 'closable', false).modal('show');
+    }
+    function confirmModalFunction(header, message) {
+        $('#confirmModal div .ui .icon .header p').html(header);
+        $('#confirmModal div .content p').html(message);
+        $('#confirmModal').modal('setting', 'closable', false).modal('show');
     }
 </script>
