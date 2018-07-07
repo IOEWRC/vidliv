@@ -40,7 +40,7 @@ def broadcast_view(request, username=None):
     pnconfig.publish_key = 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792'
     pnconfig.ssl = True
 
-    pubnub =PubNub(pnconfig)
+    pubnub = PubNub(pnconfig)
     envelope = pubnub.where_now().uuid(username + '-device').sync()
     if username + '-stream' not in envelope.result.channels:
         messages.info(request, username + ' is not streaming', extra_tags=username + ' status')
@@ -82,26 +82,28 @@ def get_username(request):
 
 
 def multi_broadcast(request, action=None, username=None):
+    # TODO replace this "pass all users as available user to invite in room"
+    users = {'users_list': User.objects.all().exclude(username=request.user.username)}
     if not username:
-        return render(request, 'home/multi_broadcaster.html', {
+        return render(request, 'home/multi_broadcaster.html', {**users, **{
             'broadcaster': True,
             'roomid': request.user.username + '-stream_room',
             'roomInitiator': True,
-        })
+        }})
     elif username and action == 'view':
         if username == request.user.username:
             return redirect('home:gomultibroadcast')
-        return render(request, 'home/multi_broadcaster.html', {
+        return render(request, 'home/multi_broadcaster.html', {**users, **{
             'broadcaster': False,
             'roomid': username + '-stream_room',
             'roomInitiator': False,
-        })
+        }})
     elif username and action == 'join':
         if username == request.user.username:
             return redirect('home:gomultibroadcast')
-        return render(request, 'home/multi_broadcaster.html', {
+        return render(request, 'home/multi_broadcaster.html', {**users, **{
             'broadcaster': True,
             'roomid': username + '-stream_room',
             'roomInitiator': False,
-        })
+        }})
     raise Http404
