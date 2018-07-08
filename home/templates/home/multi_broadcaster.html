@@ -22,6 +22,7 @@
 
         connection.extra = {
             username: '{{ request.user.username }}',
+            fullname: '{{ request.user.get_full_name }}',
             roomInitiator:{% if roomInitiator %} true {% else %} false {% endif %}
         };
 
@@ -55,9 +56,12 @@
 
         connection.onstreamended = function(event) {
             if (event.extra.roomInitiator) {
-                // TODO popup initiator left message
-                window.location.replace(window.location.protocol + '//' + window.location.host + {% url 'home:home' %})
+                generalModalFunction('Room events', 'Room initiator ' + event.extra.fullname + ' closed the room');
+                $('#generalModal #okButton').click(() => {
+                    window.location.replace(window.location.protocol + '//' + window.location.host + {% url 'home:home' %})
+                });
             }
+            if (event.extra.broadcaster) generalModalFunction('Room Events', event.extra.fullname + ' left the room.');
             var mediaElement = document.getElementById(event.streamid);
             if (mediaElement) {
                 mediaElement.parentNode.removeChild(mediaElement);
@@ -105,12 +109,27 @@
             });
         }
 
+        var config = {
+            number: '{{ request.user.username }}' + '-room',
+            publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
+            subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda',
+            ssl: true,
+            uuid: '{{ request.user.username }}' + '-device'
+        };
+        var pubnub = PUBNUB(config);
+
         {% if broadcaster and roomInitiator%}
             var broadcaster = true;
 
             beforeJoiningARoom(() => {
                 connection.open('{{ roomid }}', (isRoomExist, roomid) => {
                    afterConnectingSocket();
+                   pubnub.subscribe({
+                       channel: '{{ request.user.username }}' + '-inroom',
+                       connect: () => {
+                           console.log('Subscribed to pubnub-room');
+                       }
+                   });
                 });
             });
         {% elif broadcaster and not roomInitiator %}
@@ -150,18 +169,14 @@
                 var leave = confirm('Are you sure to leave room?');
             if (leave) {
                 connection.leave();
+                pubnub.unsubscribe({
+                    channel: '{{ request.user.username }}' + '-inroom',
+                    callback: () => {console.log('Unsubscribed from room.')}
+                });
                 window.location.replace(window.location.protocol + '//' + window.location.host + '{% url 'home:home' %}');
             }
         });
         function inviteToRoom(username) {
-            var config = {
-                number: '{{ request.user.username }}' + '-room',
-                publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
-                subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda',
-                ssl: true,
-                uuid: '{{ request.user.username }}' + '-device'
-            };
-            var pubnub = PUBNUB(config);
             pubnub.publish({
                 channel: username + '-room',
                 message: {
@@ -181,11 +196,13 @@
 {% block content %}
     <div id="videos-container"></div>
     <button class="ui inverted red button" id="multiBroadcastEndButton">End</button>
+    {% if broadcaster %}
     <ul>
         <p>Invite List</p>
         {% for user in users_list %}
             <li><button class="ui teal button" id="inviteToRoom" onclick="return inviteToRoom('{{ user.username }}')">{{ user.username }}</button></li>
         {% endfor %}
     </ul>
+    {% endif %}
     {% include 'home/base.html' %}
 {% endblock %}
