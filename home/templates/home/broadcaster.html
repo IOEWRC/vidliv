@@ -5,10 +5,7 @@
     <script src="{% static 'home/js/webrtc.js' %}"></script>
     <script src="{% static 'home/js/rtc-controller.js' %}"></script>
     <script type="text/javascript">
-        
-
         var video_out = document.getElementById('vid-box');
-         
         var streamName = '{{ request.user.username }}';
         var phone = window.phone = PHONE({
             number: streamName,
@@ -23,9 +20,9 @@
             ctrl.addLocalStream(video_out);           
             ctrl.stream();
         });
-     //   var ht= 0.5 * screen.height;
-     //   var wd = 0.6 * window.width;
-      //  $('#vid-box').css({'width': wd,'height':ht})
+        var ht= 0.5 * screen.height;
+        var wd = 0.6 * window.width;
+        $('#vid-box').css({'width': wd,'height':ht})
 
         $('#streamEndButton').click(() => {
             var leaveAns = confirm("Are you sure you want to leave stream?");
@@ -46,23 +43,27 @@
                 ctrl.unsubscribe();
                 phone.unsubscribe();
             }
-        });
+        }); 
         $('#enterEvent').keypress(function(e) {
             if(e.which == 13) {
-                var chatText = document.getElementById('texts').value;                       
-                message = {text: chatText, type: 'streamMessage', sender: '{{ request.user.username }}'};
-                ctrl.send(message);                 
+                var chatText = document.getElementById('texts').value;   
+                if(chatText != null){
+                message = {text: chatText, type: 'streamMessage', sender: '{{ request.user.username }}',image:'{{request.user.profile.get_avatar}} '};
+                ctrl.send(message);
+                $('#texts').val(' ');   
+            }                         
             }
-        });
+        });        
         ctrl.streamReceive(message => {
-            document.getElementById('chat-content').innerHTML += '<p>' + message.sender + ': ' + message.text + '</p>';
-        
+            if(message.text != null){
+            document.getElementById('cmnt').innerHTML +=  '<a class="ui image avatar"><img src="'+ message.image + '" ></a>'+
+            '<div class="content"><a class="' + 'author">' + message.sender+ '</a><div id=' + '"text_content" class="text"><p class=" ui label">' + message.text + '</p></div></div>'; 
+        }
         });
         window.setInterval(function() {
             var elem = document.getElementById('chat-box');
             elem.scrollTop = elem.scrollHeight;
-          }, 0.00000000001);
-       
+          }, 5000);
     </script>
     <style>
         #chat-box{
@@ -96,17 +97,23 @@
             <div class="column"> 
                     <div class="ui header">Live Chat</div> 
 
-                    <div class="ui top attached tertiary inverted scrolling segment" id="chat-box">
+                    <div class="ui top attached scrolling segment" id="chat-box">
                         <div id="chat-content">
-                            
+                            <div class="ui comments">
+                                <div class="comment" id ="cmnt" >
+                                <!--all the chat information -->
+                                </div>
+                            </div>                               
                         </div>
                     </div>
 
                     <div class="ui attached segment" id="enterEvent">
-                        <div class="ui small fluid icon input">
+                        <div class="ui small fluid search input">
                             <input id="texts" placeholder="CHAT..." type="text">
                         </div>                           
                     </div>
             </div>       
     </div>
 {% endblock %}
+
+  

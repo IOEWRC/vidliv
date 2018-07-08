@@ -65,19 +65,25 @@
         $('#enterEvent').keypress(function(e) {
             if(e.which == 13) {
                 var chatText = document.getElementById('texts').value;
-                message = {text: chatText, type: 'streamMessage', sender: '{{ request.user.username }}'};
-                ctrl.send(message);
+                if(chatText != null){
+                    message = {text: chatText, type: 'streamMessage', sender: '{{ request.user.username }}', image: '{{request.user.profile.get_avatar}}'};
+                    ctrl.send(message);
+                    $('#texts').val(' '); 
+                }  
             }
         });
         ctrl.streamReceive(message => {
-            document.getElementById('chat-content').innerHTML += '<p>' + message.sender +': ' + message.text + '</p>';
+            if(message.text != null){
+            document.getElementById('cmnt').innerHTML +=  '<a class="ui image avatar"><img src="' + message.image + '"></a>'+
+            '<div class="content"><a class="' + 'author">' + message.sender + '</a><div id=' + '"text_content" class="text"><p class=" ui label">' + message.text + '</p></div></div>';
+            }
         });
         window.setInterval(function() {
             var elem = document.getElementById('chat-box');
             elem.scrollTop = elem.scrollHeight;
-          }, 0.00000000001);
-        $('#okButton').click(()=>{
-            window.location.replace(window.location.protocol + '//' + window.location.host + '{% url "home:home" %}');
+          }, 5000);  
+       $('#okButton').click(()=>{
+           window.location.replace(window.location.protocol + '//' + window.location.host + '{% url "home:home" %}');
         });
     </script>
     <style>
@@ -112,14 +118,18 @@
         <div class="column"> 
                 <div class="ui header">Live Chat</div> 
 
-                <div class="ui top attached tertiary inverted segment" id="chat-box">
+                <div class="ui top attached scrolling segment" id="chat-box">
                     <div id="chat-content">
-                        
+                        <div class="ui comments">
+                            <div class="comment" id ="cmnt" >
+                            <!--all the chat information -->
+                        </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="ui attached segment" id="enterEvent">
-                    <div class="ui small fluid icon input">
+                    <div class="ui small fluid search input">
                         <input id="texts" placeholder="CHAT..." type="text">
                     </div>                           
                 </div>
