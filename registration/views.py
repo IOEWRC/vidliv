@@ -36,7 +36,7 @@ class RegistrationView(FormView):
     @method_decorator(sensitive_post_parameters('password1', 'password2'))
     def dispatch(self, request, *args, **kwargs):
         """
-        Check that user signup is allowed and if user is logged in before even bothering to
+        Check that user signup is allowed and if user is logged in before even borthering to
         dispatch or do other processing.
 
         """
@@ -190,6 +190,7 @@ def view_profile(request, username=None):
     friend, created = Friend.objects.get_or_create(current_user=request.user)
     friends = friend.friend_list.all()
     return render(request, 'registration/user_profile.html', {'user': user, 'friends': friends})
+
 
 
 def edit_profile(request):

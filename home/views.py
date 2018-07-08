@@ -5,6 +5,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.contrib.auth.models import User
+from django.db.models import Q
 from .models import Friend
 
 # PubNub import
@@ -59,19 +60,22 @@ def friend_operation(request, operation, pk):
 
 def get_username(request):
     if request.is_ajax():
-        q = request.GET.get('term', '')
-        users = User.objects.filter(username__icontains=q)
+        qstr = request.GET.get('term').strip()
+        queries = qstr.split()
+        for q in queries:
+            users = User.objects.filter(
+                Q(username__icontains=q) | Q(
+                    first_name__icontains=q) | Q(
+                        last_name__icontains=q))
+        #users = User.objects.filter(username__icontains=q)
         results = {'results': []}
         for user in users:
-            if user.profile.avatar:
-                profile_image = user.profile.avatar.url
-            else:
-                profile_image = static('img/matthew.png')
+            profile_image = user.profile.get_avatar
             username_json = {
                 'username': user.username,
                 'fullname': user.get_full_name(),
                 'profile_image': profile_image,
-                'profile_url': reverse('user_profile_other', kwargs={'username': user.username})
+                'profile_url': reverse('user_profile', kwargs={'username': user.username})
             }
             results['results'].append(username_json)
         return JsonResponse(results)
