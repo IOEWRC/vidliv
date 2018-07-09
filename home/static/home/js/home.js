@@ -2,7 +2,7 @@ function repeatMe(){
         
         $.ajax({
             type:'GET',
-            url:"/api/get_friend_list/",
+            url:"/api/get_caller_list/",
             dataType:"json",
             success:function(data){
                 // console.log(data);
