@@ -13,4 +13,5 @@ urlpatterns = [
     path('api/get_username/', views.get_username, name='searchAutoComplete'),
     # path('api/get_followers/', views.get_followers, name='getFollowers'),
     path('api/get_friend_list/', views.FriendList.as_view(), name='friendlists'),
+    path('api/get_caller_list/', views.CallerList.as_view(), name='callerList'),
 ]

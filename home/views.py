@@ -154,5 +154,52 @@ class FriendList(APIView):
         #data = json.dumps(results['results'], default=dumper, indent=1)
         #data = serializers.serialize('json', results['results'])
         data = results['results']
-        print(data)
+        # print(data)
         return Response(data)
+
+
+class CallerList(APIView):
+    """
+    List all the friends you follow and get follow back
+    """
+
+    def get(self, request, format=None):
+        # PubNub instance
+        pnconfig = PNConfiguration()
+        pnconfig.subscribe_key = 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda'
+        pnconfig.publish_key = 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792'
+        pnconfig.ssl = True
+        pubnub = PubNub(pnconfig)
+
+        # following list of request_user
+        following = Friend.objects.get(current_user=request.user)
+        following_list = following.friend_list.all()
+
+        # for followers list of request_user
+        caller_list = []
+        for user in following_list:
+            user_following_list = Friend.objects.get(current_user=user).friend_list.all()
+            for user_following in user_following_list:
+                if user_following == request.user:
+                    caller_list.append(user)
+
+        results = {'results': []}
+        for caller in caller_list:
+            envelope = pubnub.where_now().uuid(caller.username + '-device').sync()
+            if caller.username in envelope.result.channels:
+                profile_image = caller.profile.get_avatar
+                caller_json = {
+                    'username': caller.username,
+                    'fullname': caller.get_full_name(),
+                    'profile_image': profile_image,
+                    'profile_url': reverse('user_profile', kwargs={'username': caller.username})
+                }
+                results['results'].append(caller_json)
+            else:
+                continue
+        data = results['results']
+        return Response(data)
+
+
+
+
