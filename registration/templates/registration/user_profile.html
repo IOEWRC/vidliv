@@ -4,29 +4,110 @@
 {% block title %}{{ user.username }}'s profile{% endblock %}
 {% block stylesheet %}
     <link rel="stylesheet" href="{% static 'registration/css/user_profile.css' %}">
+    <link rel="stylesheet" href="{% static 'home/css/scrollable-table.css' %}">
+    <style>
+        html>body tbody.scrollContent {
+            display: block;
+            height: 450px;
+            overflow: auto;
+            width: 100%
+}
+    </style>
 {% endblock %}
 {% block content %}
-    <div class="ui container main">
-    <div class="destacados ui two column centered grid">
-            <div class="box1">
-                {% if not user.profile.avatar %}
-                    <img src="{% static 'img/matthew.png' %}" class="ui small circular image centered">
-                {% else %}
-                    <img src="{{ user.profile.avatar.url }}" class="ui small circular image centered" style="width: 100px;height: 100px">
-                     <br /> <br />
-                {% endif %}
+    <div class="ui stackable grid container">
+        <div class="six wide column">
+            <div class="destacados ui two column centered grid">
+                <div class="box1">
+                    <img src="{{ user.profile.get_avatar }}" class="ui small circular image centered" style="width: 150px;height: 150px">
+                         <br/>
 
-              <h3>{{ user.get_full_name }}</h3>
-            <h4 style="color:teal">Username: {{ user.username }}</h4>
-            <h4 style="color:teal">Location: {{ user.profile.location }}</h4>
-            <h4 style="color:teal">Phone No.: {{ user.profile.phone_number }}</h4>
-            <h4 style="color:teal">Gender: {{ user.profile.get_gender_display }}</h4>
-            <h4 style="color:teal">About Me: {{ user.profile.about_me }}</h4>
-            <hr>
-            <button class="ui button teal" href="#"><span>Call </span></button>
-                <button class="ui button teal" href="{% url 'edit_profile' %}" ><span>Update Profile</span></button>
-                <br><hr>
+                    <h3>{{ user.get_full_name }}</h3>
+                    <h4 style="color:teal">Username :&nbsp;{{ user.username }}</h4>
+                    <h4 style="color:teal">Location :&nbsp; {{ user.profile.location }}</h4>
+                    <h4 style="color:teal">Phone No. :&nbsp; {{ user.profile.phone_number }}</h4>
+                    <h4 style="color:teal">Gender :&nbsp; {{ user.profile.get_gender_display }}</h4>
+                    <h4 style="color:teal">About Me :<div>{{ user.profile.about_me }}</div></h4>
+                    <hr>
+                    {% if request.user == user %}
+                        <a class="ui button teal" href="{% url 'edit_profile' %}" ><span>Update Profile</span></a>
+                    {% else %}
+                        {% if user in following_request_user %}
+                            <a class="ui button teal" href="{% url 'home:friendOperation' operation='unfriend' pk=user.pk %}"><span><i class="minus circle icon"></i>UnFollow</span></a>
+                        {% else %}
+                            <a class="ui button teal" href="{% url 'home:friendOperation' operation='addfriend' pk=user.pk %}"><span><i class="plus circle icon"></i>Follow</span></a>
+                        {% endif %}
+                    {% endif %}
+                        <br><hr>
+                </div>
             </div>
+        </div>
+        <div class="five wide column">
+             <div id="followingList" class="tableContainer">
+                <table class="ui teal table green scrollTable">
+                  <thead class="fixedHeader">
+                    <tr><th>Following</th>
+                    <th></th>
+                  </tr></thead>
+                  <tbody class="scrollContent">
+                    {% if following %}
+                        {% for usr in following %}
+                             <tr>
+                              <td>
+                                <h4 class="ui image header">
+
+                                    <img src="{{ usr.profile.get_avatar }}" class="ui mini rounded image" >
+                                    <br />
+                                    <div class='name'><a href="{% url 'user_profile' usr %}" ><small>{{usr.get_full_name}}</small></a></div>
+                                    <div>@<a href="{% url 'user_profile' usr %}" class="username"><small>{{usr.username}}</small></a></div>
+                              </h4></td>
+                              <td>
+                                  {% if user == request.user %}
+                                    <a type="button" class="ui inverted red button" href="{% url 'home:friendOperation' operation='unfriend' pk=usr.pk %}">Unfollow</a>
+                                  {% endif %}
+                              </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td>{{ user.username }} isn't following anybody !!!</td></tr>
+                    {% endif %}
+                  </tbody>
+                </table>
+             </div>
+        </div>
+        <div class="five wide column">
+                <div id="followingList" class="tableContainer">
+                <table class="ui teal table green scrollTable">
+                  <thead class="fixedHeader">
+                    <tr><th>Followers</th>
+                    <th></th>
+                  </tr></thead>
+                  <tbody class="scrollContent">
+                    {% if followers %}
+                        {% for usr in followers %}
+                             <tr>
+                              <td>
+                                <h4 class="ui image header">
+
+                                    <img src="{{ usr.profile.get_avatar }}" class="ui mini rounded image" >
+                                    <br />
+                                    <div class='name'><a href="{% url 'user_profile' usr %}" ><small>{{usr.get_full_name}}</small></a></div>
+
+                                    <div>@<a href="{% url 'user_profile' usr %}" class="username"><small>{{usr.username}}</small></a></div>
+                              </h4></td>
+                              <td>
+                                  {% if user == request.user and usr not in following_request_user %}
+                                    <a type="button" class="ui inverted green button" href="{% url 'home:friendOperation' operation='addfriend' pk=usr.pk %}">Follow</a>
+                                  {% endif %}
+                              </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr><td>No one is following {{ user.username }} !!!</td></tr>
+                    {% endif %}
+                  </tbody>
+                </table>
+             </div>
         </div>
     </div>
 {% endblock %}

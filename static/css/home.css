@@ -49,3 +49,21 @@ body{
        url('../fonts/oleo-script-swash-caps-v5-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
+a.name{
+  text-decoration: none;
+  /* color:#03444de0; */
+  color:#00b5ad;
+}
+a:hover.name{
+  text-decoration: underline;
+}
+
+a.username{
+  text-decoration: None;
+  font-style: italic;
+  color:rgb(12, 69, 77)
+}
+a:hover.username{
+  text-decoration: underline;
+
+}

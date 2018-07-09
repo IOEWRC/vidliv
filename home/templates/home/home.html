@@ -1,12 +1,17 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title_name %}VidLIV: Home{% endblock %}
-
 {% block script %}
     <script src="{% static 'home/js/pubnub.js' %}"></script>
     <script src="{% static 'home/js/webrtc.js' %}"></script>
     <script src="{% static 'home/js/rtc-controller.js' %}"></script>
+    <script src="{% static 'home/js/home.js'%}"></script>
     <script type="text/javascript">
+        {% if messages %}
+            {% for message in messages %}
+                generalModalFunction('{{ message.extra_tags }}', '{{ message }}');
+            {% endfor %}
+        {% endif %}
         const video_out = document.getElementById('vid-box');
         const vid_thumb = document.getElementById('vid-thumb');
         const phone = window.phone = PHONE({
@@ -47,7 +52,9 @@
                     }).modal('show');
                     ctrl.dial(username);
                 }
-                else alert(username + ' is offline');
+                else {
+                    generalModalFunction(username + ' status', username + ' is OFFLINE!!!');
+                }
             });
         }
         $('#endCallButton').click(() => {
@@ -89,33 +96,114 @@
                 ctrl.unsubscribe();
             }
         });
+        function watchLive(username, url) {
+            ctrl.isStreaming(username, isOn =>{
+               if (isOn) {console.log('a');
+                   window.location.replace(window.location.protocol + '//' + window.location.host + url);}
+               else {
+                   generalModalFunction(username + ' streaming status', username + ' is not streaming !!!');
+               }
+            });
+        }
+        phone.pubnub.subscribe({
+            channel: phone.number() + '-room',
+            message: roomMessageHandler,
+            connect: () => {
+                console.log('Subscribed to stream room');
+            }
+        });
+        function roomMessageHandler(message) {
+            confirmModalFunction('Room invite from ' + message.fullname, 'Do you want to join the room?');
+            $('#confirmModal #confirmModalYes').click(() => {
+                window.location.replace(window.location.protocol + '//' + window.location.host + message.roomUrl);
+            });
+        }
+        
     </script>
 {% endblock %}
 
 {% block content %}
-    <div class="ui container">
-    <p><h1>Welcome to VidLIV</h1></p>
-    <p>Coming soon</p>
-    <div id="userList">
-    <table class="ui teal table">
-        <thead>
-        <tr>
-            <td>users</td>
-            <td>actions</td>
-        </tr>
-        </thead>
-        <tbody>
-        {% for usr in user_list %}
-            <tr>
-            <td>{{ usr.username }}</td>
-            <td>
-                <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
-            </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    </div>
-    </div>
-    {% block call %}{% include 'home/call.html' %}{% endblock %}
+        <div class="ui container">
+            <a href="{% url 'home:golive'%}" class="ui red button"><i class="video icon"></i>GoLive</a>
+            <a href="{% url 'home:gomultibroadcast' %}" class="ui red button"><i class="nintendo switch icon"></i>OpenRoom</a>
+        </div>
+        <hr>
+        <div class="ui stackable grid container">
+            <div class="eight wide column">
+                    <div id="userList" class="tableContainer">
+                        <table class="ui teal table green scrollTable myTable">
+                      <thead class="fixedHeader">
+                        {% comment %} <tr><th>Online Friends</th>
+                        <th></th>
+                      </tr></thead>
+                      <tbody class="scrollContent">
+                        {% if view.friend_list %}
+                            {% for usr in view.friend_list %}
+                                <tr>
+                                    <td>
+                                        <h4 class="ui image header" id="header">
+                                            <img src="{{ usr.profile.get_avatar }}" class="ui mini rounded image" >
+    {#                                                 <br />#}
+                                            <div class='name'><a href="{% url 'user_profile' usr %}" >{{ usr.get_full_name }}</a></div>
+    {##}
+                                            <div>@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
+                                        </h4></td>
+                                      <td id="callButton">
+                                        <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
+                                      </td>
+                                    </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td>No friends.. Add some friends to call them !!!</td></tr>
+                        {% endif %} {% endcomment %}
+                        {% comment %} <tr><th>Friends&nbsp;<button class="ui inverted blue button stop">Stop</button></th> {% endcomment %}
+                        <tr>
+                            <th>Friends</th>
+                            <th>Action</th>
+                        </tr></thead>
+                      <tbody class="scrollContent" id='onlineuser'>
+                        <tr><td>No friends.. Add some friends to call them !!!</td></tr>
+                      </tbody>
+                    </table>
+                    </div>
+            </div>
+            <div class="eight wide column">
+                    <div id="userList1" class="tableContainer">
+                        <table class="ui teal table green scrollTable">
+                      <thead class="fixedHeader">
+                        <tr><th>Online Streamers</th>
+                        <th></th>
+                      </tr></thead>
+                      <tbody class="scrollContent" id="streamers">
+                        {% comment %} {% if view.friend_list %}
+                            {% for usr in view.friend_list %}
+                                 <tr>
+                                  <td>
+                                    <h4 class="ui image header">
+                                        <img src="{{ usr.profile.get_avatar }}" class="ui mini rounded image" >
+                                        <div class='content'>
+                                            <a href="{% url 'user_profile' usr %}" class="name">{{ usr.get_full_name }}</a>
+                                        <div class="sub header">@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
+                                        </div>
+                                    </h4>
+                                  </td>
+                                  <td>
+                                    <button type="button" class="ui red button" onclick="watchLive('{{ usr.username }}', '{% url "home:watchlive" username=usr.username %}')"><i class="play icon"></i>WatchLive</button>
+                                  </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                           <tr><td>No friends.. Add some friends to watch their stream !!!</td></tr>
+                        {% endif %} {% endcomment %}
+                        <tr><td>No Live Streams.. Follow some streams to watch them live !!!</td></tr>
+                      </tbody>
+                    </table>
+                    </div>
+            </div>
+        </div>
+<div><br></div>
+    {% block call %}{% include 'home/call.html' %}{% include 'home/base.html' %}{% endblock %}
+{% endblock %}
+{% block stylesheet %}
+    <link rel="stylesheet" href="{% static 'home/css/scrollable-table.css' %}">
 {% endblock %}

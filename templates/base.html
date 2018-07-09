@@ -58,6 +58,28 @@
         on: 'hover'
       });
     });
+
+    $('#searchBar').search({
+        minCharacters : 2,
+        apiSettings   : {
+            onResponse: function(vidLIVResponse) {
+                var response = {
+                    results : []
+                };
+                // translate vidliv api response to work with search
+                $.each(vidLIVResponse.results, function(index, item) {
+                    response.results.push({
+                        title: item.fullname,
+                        image: item.profile_image,
+                        url: item.profile_url,
+                        description: item.username
+                    });
+                });
+                return response;
+            },
+            url: '{% url "home:searchAutoComplete" %}' + '?term={query}'
+        }
+    });
 </script>
 </body>
 </html>

@@ -1,0 +1,48 @@
+<div class="ui tiny modal" id="generalModal" >
+  <div class="ui icon header">
+    <i class="envelope icon"></i>
+    <p id="header"></p>
+  </div>
+  <div class="content">
+    <p id="msg" style="color: red;size: auto;text-align: center"></p>
+  </div>
+  <div class="actions">
+    <div class="ui green ok inverted button" id="okButton">
+      <i class="checkmark icon"></i>
+      OK
+    </div>
+  </div>
+</div>
+
+<div class="ui basic modal" id="confirmModal">
+  <div class="ui icon header">
+    <i class="archive icon"></i>
+      <p id="header"></p>
+  </div>
+  <div class="content">
+    <p id="message"></p>
+  </div>
+  <div class="actions">
+    <div class="ui red basic cancel inverted button" id="confirmModalNo">
+      <i class="remove icon"></i>
+      No
+    </div>
+    <div class="ui green ok inverted button" id="confirmModalYes">
+      <i class="checkmark icon"></i>
+      Yes
+    </div>
+  </div>
+</div>
+
+<script>
+    function generalModalFunction(header, message) {
+        $('#generalModal #msg').html(message);
+        $('#generalModal #header').html(header);
+        $('#generalModal').modal('setting', 'closable', false).modal('show');
+    }
+    function confirmModalFunction(header, message) {
+        $('#confirmModal #header').html(header);
+        $('#confirmModal #message').html(message);
+        $('#confirmModal').modal('setting', 'closable', false).modal('show');
+    }
+</script>

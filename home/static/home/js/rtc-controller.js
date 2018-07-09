@@ -73,16 +73,14 @@ var CONTROLLER = window.CONTROLLER = function(phone, serverFunc){
 	
 	function broadcast(vid){
 	    var video = document.createElement('video');
-        video.srcObject    = phone.mystream;
+        video.srcObject = phone.mystream;
         video.volume = 0.0;
         video.setAttribute('width', '100%');
         video.setAttribute('height', '100%');
         video.play();
 	    video.setAttribute( 'autoplay', 'autoplay' );
+	    video.setAttribute('controls', 'controls');
 	    video.setAttribute( 'data-number', phone.number() );
-	    vid.style.cssText ="-moz-transform: scale(-1, 1); \
-						 	-webkit-transform: scale(-1, 1); -o-transform: scale(-1, 1); \
-							transform: scale(-1, 1); filter: FlipH;";
 		vid.appendChild(video);
     };
     
@@ -109,6 +107,7 @@ var CONTROLLER = window.CONTROLLER = function(phone, serverFunc){
 	    var ch = (name ? name : phone.number()) + "-stream";
 	    pubnub.unsubscribe({
             channel    : ch,
+            callback: () => {console.log('Subscribed to ' + ch);}
         });
     };
 
@@ -128,7 +127,7 @@ var CONTROLLER = window.CONTROLLER = function(phone, serverFunc){
 	    if (!stream_name) return; // Not in a stream
 		pubnub.publish({ 
 			channel: stream_name,
-			message: msg,
+			message: message,
 			callback : function(m){console.log(m)}
 		});
     }

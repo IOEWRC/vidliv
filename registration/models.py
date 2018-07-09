@@ -700,8 +700,8 @@ class SupervisedRegistrationProfile(RegistrationProfile):
 
 class UserProfile(models.Model):
     GENDER_CHOICES = (
-        ('M', 'Male'),
-        ('F', 'Female')
+        ('Male', 'Male'),
+        ('Female', 'Female')
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     location = models.CharField(max_length=100)
@@ -714,6 +714,15 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.username
 
+    @property
+    def get_avatar(self):
+        if self.avatar:
+            return self.avatar.url
+        else:
+            if self.gender == 'Male':
+                return "/static/img/matthew.png"
+            else:
+                return "/static/img/molly.png"
 
 @receiver(post_save, sender=User)
 def create_profile(sender, **kwargs):
