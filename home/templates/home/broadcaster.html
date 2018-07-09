@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block script %}
+    <script src="{% static 'home/js/pubnub.js' %}"></script>
+    <script src="{% static 'home/js/webrtc.js' %}"></script>
+    <script src="{% static 'home/js/rtc-controller.js' %}"></script>
+    <script type="text/javascript">
+        
+
+        var video_out = document.getElementById('vid-box');
+         
+        var streamName = '{{ request.user.username }}';
+        var phone = window.phone = PHONE({
+            number: streamName,
+            publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
+            subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda',
+            oneway: true,
+            broadcast: true
+        });
+        var ctrl = window.ctrl = CONTROLLER(phone, get_xirsys_servers);
+        ctrl.ready(() => {
+            $('#loading').remove();    
+            ctrl.addLocalStream(video_out);           
+            ctrl.stream();
+        });
+     //   var ht= 0.5 * screen.height;
+     //   var wd = 0.6 * window.width;
+      //  $('#vid-box').css({'width': wd,'height':ht})
+
+        $('#streamEndButton').click(() => {
+            var leaveAns = confirm("Are you sure you want to leave stream?");
+            if (leaveAns) {
+                if (window.phone) {
+                    ctrl.hangup();
+                    ctrl.leaveStream(streamName);
+                    ctrl.unsubscribe();
+                    phone.unsubscribe();
+                }
+                window.location.replace(window.location.protocol + '//' + window.location.host + '{% url "home:home" %}');
+            }
+        });
+        $(window).bind('beforeunload', () => {
+            if (window.phone) {
+                ctrl.hangup();
+                ctrl.leaveStream(streamName);
+                ctrl.unsubscribe();
+                phone.unsubscribe();
+            }
+        });
+        $('#enterEvent').keypress(function(e) {
+            if(e.which == 13) {
+                var chatText = document.getElementById('texts').value;                       
+                message = {text: chatText, type: 'streamMessage', sender: '{{ request.user.username }}'};
+                ctrl.send(message);                 
+            }
+        });
+        ctrl.streamReceive(message => {
+            document.getElementById('chat-content').innerHTML += '<p>' + message.sender + ': ' + message.text + '</p>';
+        
+        });
+        window.setInterval(function() {
+            var elem = document.getElementById('chat-box');
+            elem.scrollTop = elem.scrollHeight;
+          }, 0.00000000001);
+       
+    </script>
+    <style>
+        #chat-box{
+            overflow-x: auto;
+            overflow-y: auto; 
+            position:   relative;
+            height:     70%;
+            width:   70%;
+            bottom: 0;   
+        }
+
+        #chat-content{
+            position: absolute;
+        }
+
+        #enterEvent{
+            width:   70%;
+        }    
+    </style>
+   
+{% endblock %}
+{% block content %}
+    <div class="ui stackable two column grid container">
+            <div class="column">
+                <div class="ui inverted segment" id="vid-box">
+                    <div id="loading" class="ui active inverted loader"></div>                   
+                       
+                </div>  
+                <button class="ui inverted red button" id="streamEndButton">End</button>
+            </div>
+            <div class="column"> 
+                    <div class="ui header">Live Chat</div> 
+
+                    <div class="ui top attached tertiary inverted scrolling segment" id="chat-box">
+                        <div id="chat-content">
+                            
+                        </div>
+                    </div>
+
+                    <div class="ui attached segment" id="enterEvent">
+                        <div class="ui small fluid icon input">
+                            <input id="texts" placeholder="CHAT..." type="text">
+                        </div>                           
+                    </div>
+            </div>       
+    </div>
+{% endblock %}

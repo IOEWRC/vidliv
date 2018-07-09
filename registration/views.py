@@ -10,6 +10,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
+from home.models import Friend
 from registration.forms import ResendActivationForm
 from django.contrib.auth.models import User
 from .forms import UserForm, ProfileForm, CustomRegistrationForm
@@ -35,7 +36,7 @@ class RegistrationView(FormView):
     @method_decorator(sensitive_post_parameters('password1', 'password2'))
     def dispatch(self, request, *args, **kwargs):
         """
-        Check that user signup is allowed and if user is logged in before even bothering to
+        Check that user signup is allowed and if user is logged in before even borthering to
         dispatch or do other processing.
 
         """
@@ -179,12 +180,15 @@ class ApprovalView(TemplateView):
         raise NotImplementedError
 
 
-def view_profile(request, pk=None):
-    if pk:
-        user = get_object_or_404(User, pk=pk)
+def view_profile(request, username=None):
+    friend, created = Friend.objects.get_or_create(current_user=request.user)
+    friends = friend.friend_list.all()
+    if User.objects.filter(username=username).exists():
+        user = User.objects.get(username=username)
+        return render(request, 'registration/user_profile.html', {'user': user, 'friends': friends})
     else:
-        user = request.user
-    return render(request, 'registration/user_profile.html', {'user': user})
+        return render(request, 'registration/user_not_found.html', {'username': username})
+
 
 
 def edit_profile(request):
@@ -194,7 +198,7 @@ def edit_profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return redirect('user_profile')
+            return redirect('user_profile', username=request.user.username)
     else:
         user_form = UserForm(instance=request.user)
         profile_form = ProfileForm(instance=request.user.profile)

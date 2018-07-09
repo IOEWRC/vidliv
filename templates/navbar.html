@@ -3,34 +3,39 @@
     <div class="ui container">
         <a href="{%url 'landing_page'%}" class="header item">
           <!-- <img class="logo" src="{% static 'img/logo.png'%}"> -->
-            <i class="video icon"></i>
-          Vidliv
+          Vidliv&nbsp;
+          <i class="video icon"></i>
         </a>
-        <div class="item">
-        <a href="{%url 'landing_page'%}" class="ui item navitem "><i class="home link icon"></i>Home</a>
-        </div>
-        {% if user.is_authenticated %}
-        <div class="ui right item">
-            <div class="ui search icon input">
-              <input placeholder="Search users..." type="text">
+
+        <a href="{%url 'landing_page'%}" class="item"><i class="home link icon"></i>Home</a>
+        <div class="ui fluid search right item" id="searchBar">
+          <div class="ui left icon input">
+              <input class="prompt" placeholder="Search VidLIVs......" type="text">
               <i class="search link icon"></i>
             </div>
+            <div class="ui results fluid"></div>
+        </div>
+        
+        {% if not user.is_authenticated %}
+        <div class="ui right inverted teal menu">   
+          <a href="{%url 'registration_register'%}" class="item"><i class="users link icon"></i>Signup</a>
+          <a href="{% url 'auth_login' %}" class="item"><i class="user circle link icon"></i>Login</a>
         </div>
         {% endif %}
-  
-        <div class="ui right item ">
-            {% if not user.is_authenticated %}
-              
-          <div><a href="{%url 'registration_register'%}" class="item"><i class="users link icon"></i>Signup</a></div>
-          <div><a href="{% url 'auth_login' %}" class="item"><i class="user circle link icon"></i>Login</a></div>
-
-          {% endif %}
 
         {% if user.is_authenticated %}
-        <div class="ui right item">
-          <a href="{% url 'user_profile' %}" > <i class="user circle outline link icon"></i>{{ request.user.username }}
+        <div class="ui right inverted teal menu">
+          
+          <a href="{% url 'user_profile' request.user.username %}" class="item" >
+
+              <img src="{{ request.user.profile.get_avatar }}" class="ui small circular image" style="width: 35px;height: 35px">
+               <br /> <br />
+          {% endif %}
+            &nbsp; {{ request.user.get_full_name }}
+
           </a>
-        </div>
+          
+          
         <div class=" ui dropdown item"><i class="settings icon"></i>
           Settings
           <div class="menu">
@@ -41,11 +46,10 @@
             <a class="item" href="{%url 'auth_logout' %}">
                 <i class="sign out alternate icon"></i>Log Out</a>
             <div class="divider"></div>
-            <div class="header">Rowdy</div>
+            <div class="header">{{ request.user.get_full_name }}</div>
           </div>
           </div>
-          {%endif%}
-        </div>
+          </div>
+        
     </div>
     </div>
-    

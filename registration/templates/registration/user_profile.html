@@ -9,22 +9,25 @@
     <div class="ui container main">
     <div class="destacados ui two column centered grid">
             <div class="box1">
-                {% if not user.profile.avatar %}
-                    <img src="{% static 'img/matthew.png' %}" class="ui small circular image centered">
-                {% else %}
-                    <img src="{{ user.profile.avatar.url }}" class="ui small circular image centered" style="width: 100px;height: 100px">
-                     <br /> <br />
-                {% endif %}
+                <img src="{{ user.profile.get_avatar }}" class="ui small circular image centered" style="width: 150px;height: 150px">
+                     <br/>
 
               <h3>{{ user.get_full_name }}</h3>
-            <h4 style="color:teal">Username: {{ user.username }}</h4>
-            <h4 style="color:teal">Location: {{ user.profile.location }}</h4>
-            <h4 style="color:teal">Phone No.: {{ user.profile.phone_number }}</h4>
-            <h4 style="color:teal">Gender: {{ user.profile.get_gender_display }}</h4>
-            <h4 style="color:teal">About Me: {{ user.profile.about_me }}</h4>
+            <h4 style="color:teal">Username :&nbsp;{{ user.username }}</h4>
+            <h4 style="color:teal">Location :&nbsp; {{ user.profile.location }}</h4>
+            <h4 style="color:teal">Phone No. :&nbsp; {{ user.profile.phone_number }}</h4>
+            <h4 style="color:teal">Gender :&nbsp; {{ user.profile.get_gender_display }}</h4>
+            <h4 style="color:teal">About Me :<div>{{ user.profile.about_me }}</div></h4>
             <hr>
-            <button class="ui button teal" href="#"><span>Call </span></button>
-                <button class="ui button teal" href="{% url 'edit_profile' %}" ><span>Update Profile</span></button>
+            {% if request.user is user %}
+                <a class="ui button teal" href="{% url 'edit_profile' %}" ><span>Update Profile</span></a>
+            {% else %}
+                {% if user in friends %}
+                <a class="ui button teal" href="{% url 'home:friendOperation' operation='unfriend' pk=user.pk %}"><span><i class="minus circle icon"></i>UnFollow</span></a>
+                {% else %}
+                    <a class="ui button teal" href="{% url 'home:friendOperation' operation='addfriend' pk=user.pk %}"><span><i class="plus circle icon"></i>Follow</span></a>
+                {% endif %}
+            {% endif %}
                 <br><hr>
             </div>
         </div>

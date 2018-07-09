@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block script %}
+    <script src="{% static 'home/js/pubnub.js' %}"></script>
+    <script src="{% static 'home/js/webrtc.js' %}"></script>
+    <script src="{% static 'home/js/rtc-controller.js' %}"></script>
+    <script type="text/javascript">
+        var video_out = document.getElementById('vid-box');
+        var viewer = '{{ request.user.username }}';
+        var streamName = '{{ streamName }}';
+        var phone = window.phone = PHONE({
+            number: viewer,
+            publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
+            subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda',
+            oneway: true
+        });
+        var ctrl = window.ctrl = CONTROLLER(phone, get_xirsys_servers);
+        ctrl.ready(() => {
+            ctrl.isStreaming(streamName, isOn => {
+                if (isOn) ctrl.joinStream(streamName);
+                else {
+                    generalModalFunction(streamName + ' streaming status', streamName + ' is not streaming !!!');
+                }
+            });
+        });
+        ctrl.receive(session => {
+            session.connected(session => {
+                $('#loading').remove();
+                video_out.appendChild(session.video);
+            });
+            session.ended(session => {
+                if (session.number === streamName) {
+                    // TODO add message 'streaming ended'
+                    window.location.replace(window.location.protocol + '//' + window.location.host + "{% url 'home:home' %}");
+                }
+            });
+        });
+        $('#leaveStreamButton').click(() => {
+            var leaveAns = confirm("Are you sure you want to leave stream?");
+            if (leaveAns) {
+                if (window.phone) {
+                    ctrl.hangup();
+                    ctrl.leaveStream(streamName);
+                    ctrl.unsubscribe();
+                    phone.unsubscribe();
+                }
+                window.location.replace(window.location.protocol + '//' + window.location.host + '{% url "home:home" %}');
+            }
+        });
+        $(window).bind('beforeunload', () => {
+            var leaveAns = confirm("Are you sure you want to leave stream?");
+            if (leaveAns) {
+                if (window.phone) {
+                    ctrl.hangup();
+                    ctrl.leaveStream(streamName);
+                    ctrl.unsubscribe();
+                    phone.unsubscribe();
+                }
+            }
+        });
+        var ht= 0.5 * screen.height;
+        var wd = 0.6 * window.width;
+        $('#vid-box').css({'width': wd,'height':ht});
+
+        $('#enterEvent').keypress(function(e) {
+            if(e.which == 13) {
+                var chatText = document.getElementById('texts').value;
+                message = {text: chatText, type: 'streamMessage', sender: '{{ request.user.username }}'};
+                ctrl.send(message);
+            }
+        });
+        ctrl.streamReceive(message => {
+            document.getElementById('chat-content').innerHTML += '<p>' + message.sender +': ' + message.text + '</p>';
+        });
+        window.setInterval(function() {
+            var elem = document.getElementById('chat-box');
+            elem.scrollTop = elem.scrollHeight;
+          }, 0.00000000001);
+        $('#okButton').click(()=>{
+            window.location.replace(window.location.protocol + '//' + window.location.host + '{% url "home:home" %}');
+        });
+    </script>
+    <style>
+            #chat-box{
+                overflow-x: auto;
+                overflow-y: auto; 
+                position:   relative;
+                height:     70%;
+                width:   70%;
+                bottom: 0;   
+            }
+    
+            #chat-content{
+                position: absolute;
+            }
+    
+            #enterEvent{
+                width:   70%;
+            }    
+        </style>
+{% endblock %}
+{% block content %}
+<div class="ui stackable two column grid container">
+        <div class="column">
+            <div class="ui inverted segment" id="vid-box">
+                <div id="loading" class="ui active inverted loader"></div>
+
+            </div>
+            <button class="ui inverted red button" id="leaveStreamButton">Leave</button>
+        </div>
+
+        <div class="column"> 
+                <div class="ui header">Live Chat</div> 
+
+                <div class="ui top attached tertiary inverted segment" id="chat-box">
+                    <div id="chat-content">
+                        
+                    </div>
+                </div>
+
+                <div class="ui attached segment" id="enterEvent">
+                    <div class="ui small fluid icon input">
+                        <input id="texts" placeholder="CHAT..." type="text">
+                    </div>                           
+                </div>
+        </div>  
+
+</div>
+    {% block call %}{% include 'home/base.html' %}{% endblock %}
+{% endblock %}

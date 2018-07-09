@@ -1,15 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block stylesheet %}
-    <link rel="stylesheet" href="{% static 'home/css/getHTMLMediaElement.css' %}">
-{% endblock %}
 
 {% block script %}
     <script src="{% static 'home/js/RTCMultiConnection.js' %}"></script>
     <script src="{% static 'home/js/adapter.js' %}"></script>
     <script src="{% static 'home/js/socket.io.js' %}"></script>
-    <script src="{% static 'home/js/getHTMLMediaElement.js' %}"></script>
+    <script src="{% static 'home/js/pubnub.js' %}"></script>
     <script type="text/javascript">
         var connection = new RTCMultiConnection();
 
@@ -20,7 +17,14 @@
         connection.session = {
             audio: true,
             video: true,
-            broadcast: true
+            broadcast: true,
+            data: true
+        };
+
+        connection.extra = {
+            username: '{{ request.user.username }}',
+            fullname: '{{ request.user.get_full_name }}',
+            roomInitiator:{% if roomInitiator %} true {% else %} false {% endif %}
         };
 
         connection.sdpConstraints.mandatory = {
@@ -31,21 +35,7 @@
         connection.videosContainer = document.getElementById('videos-container');
 
         connection.onstream = function(event) {
-            var width = parseInt(connection.videosContainer.clientWidth / 2) - 20;
-            var mediaElement = getHTMLMediaElement(event.mediaElement, {
-                title: event.userid,
-                buttons: ['full-screen'],
-                width: width,
-                showOnMouseEnter: false
-            });
-
-            connection.videosContainer.appendChild(mediaElement);
-
-            setTimeout(function() {
-                mediaElement.media.play();
-            }, 5000);
-
-            mediaElement.id = event.streamid;
+            connection.videosContainer.appendChild(event.mediaElement);
 
             if (event.type === 'remote' && connection.isInitiator) {
                 var participants = [];
@@ -66,6 +56,13 @@
         };
 
         connection.onstreamended = function(event) {
+            if (event.extra.roomInitiator) {
+                generalModalFunction('Room events', 'Room initiator ' + event.extra.fullname + ' closed the room');
+                $('#generalModal #okButton').click(() => {
+                    window.location.replace(window.location.protocol + '//' + window.location.host + "{% url 'home:home' %}");
+                });
+            }
+            if (event.extra.broadcaster) generalModalFunction('Room Events', event.extra.fullname + ' left the room.');
             var mediaElement = document.getElementById(event.streamid);
             if (mediaElement) {
                 mediaElement.parentNode.removeChild(mediaElement);
@@ -84,40 +81,63 @@
         }
 
         function afterConnectingSocket() {
-        connection.socket.on(connection.socketCustomEvent, function(message) {
-            console.error('custom message', message);
+            connection.socket.on(connection.socketCustomEvent, function(message) {
+                console.error('custom message', message);
 
-            if (message.participants && !connection.isInitiator) {
-                message.participants.forEach(function(participant) {
-                    if (participant.pid === connection.userid) return;
-                    if (connection.getAllParticipants().indexOf(participant.pid) !== -1) return;
-                    if (broadcaster === true && participant.broadcaster === false) return;
+                if (message.participants && !connection.isInitiator) {
+                    message.participants.forEach(function(participant) {
+                        if (participant.pid === connection.userid) return;
+                        if (connection.getAllParticipants().indexOf(participant.pid) !== -1) return;
+                        if (broadcaster === true && participant.broadcaster === false) return;
 
-                    console.error('I am joining:', participant.pid);
-                    connection.join(participant.pid);
-                });
-            }
-
-            if (message.giveAllParticipants && connection.isInitiator) {
-                var participants = [];
-                connection.getAllParticipants().forEach(function(pid) {
-                    participants.push({
-                        pid: pid,
-                        broadcaster: connection.peers[pid].extra.broadcaster === true
+                        console.error('I am joining:', participant.pid);
+                        connection.join(participant.pid);
                     });
-                });
-                connection.socket.emit(connection.socketCustomEvent, {
-                    participants: participants
-                });
-            }
-        });
-    }
+                }
 
-        {% if broadcaster %}
+                if (message.giveAllParticipants && connection.isInitiator) {
+                    var participants = [];
+                    connection.getAllParticipants().forEach(function(pid) {
+                        participants.push({
+                            pid: pid,
+                            broadcaster: connection.peers[pid].extra.broadcaster === true
+                        });
+                    });
+                    connection.socket.emit(connection.socketCustomEvent, {
+                        participants: participants
+                    });
+                }
+            });
+        }
+
+        var config = {
+            number: '{{ request.user.username }}' + '-room',
+            publish_key: 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792',
+            subscribe_key: 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda',
+            ssl: true,
+            uuid: '{{ request.user.username }}' + '-device'
+        };
+        var pubnub = PUBNUB(config);
+
+        {% if broadcaster and roomInitiator%}
             var broadcaster = true;
 
             beforeJoiningARoom(() => {
-                connection.openOrJoin('{{ roomid }}', (isRoomExist, roomid) => {
+                connection.open('{{ roomid }}', (isRoomExist, roomid) => {
+                   afterConnectingSocket();
+                   pubnub.subscribe({
+                       channel: '{{ request.user.username }}' + '-inroom',
+                       connect: () => {
+                           console.log('Subscribed to pubnub-room');
+                       }
+                   });
+                });
+            });
+        {% elif broadcaster and not roomInitiator %}
+            var broadcaster = true;
+
+            beforeJoiningARoom(() => {
+                connection.join('{{ roomid }}', (isRoomExist, roomid) => {
                    afterConnectingSocket();
                 });
             });
@@ -142,9 +162,129 @@
 
             joinBroadcastLooper('{{ roomid }}');
         {% endif %}
+        $('#multiBroadcastEndButton').click(() => {
+            if (connection.isInitiator) {
+                var leave = confirm('You are the initiator of room. Do you want to close room?');
+            }
+            else
+                var leave = confirm('Are you sure to leave room?');
+            if (leave) {
+                connection.leave();
+                pubnub.unsubscribe({
+                    channel: '{{ request.user.username }}' + '-inroom',
+                    callback: () => {console.log('Unsubscribed from room.')}
+                });
+                window.location.replace(window.location.protocol + '//' + window.location.host + '{% url 'home:home' %}');
+            }
+        });
+        function inviteToRoom(username) {
+            pubnub.publish({
+                channel: username + '-room',
+                message: {
+                    sender: config.number,
+                    fullname: '{{ request.user.get_full_name }}',
+                    roomUrl: '{% url "home:multistreamaction" action="join" username=request.user.username %}'
+                },
+                callback: () => {
+                    //Add onRequestCompleteEvent
+                }
+            })
+
+        }
+        $('#enterEvent').keypress(function(e) {
+            if(e.which == 13) {
+                var chatText = document.getElementById('texts').value;   
+                if(chatText != null){
+                message = {text: chatText, type: 'streamMessage', sender: '{{ request.user.username }}',image:'{{request.user.profile.get_avatar}} '};
+                connection.send(message);
+                if(message.text != null){
+                    document.getElementById('cmnt').innerHTML +=  '<a class="ui image avatar"><img src="'+ message.image + '" ></a>'+
+                    '<div class="content"><a class="' + 'author">' + message.sender+ '</a><div id=' + '"text_content" class="text"><p class=" ui label">' + message.text + '</p></div></div>'; 
+                } 
+                $('#texts').val(' ');
+                 
+            }                         
+            }
+        });
+        connection.enableLogs = false;
+        connection.onmessage = function(message){
+            if(message.data.text != null){
+                document.getElementById('cmnt').innerHTML +=  '<a class="ui image avatar"><img src="'+ message.data.image + '" ></a>'+
+                '<div class="content"><a class="' + 'author">' + message.data.sender+ '</a><div id=' + '"text_content" class="text"><p class=" ui label">' + message.data.text + '</p></div></div>'; 
+            }
+    
+
+        } 
+
+        //$('video').wrapall("<div class='ui six wide column segment'></div>")
     </script>
+
+{% endblock %}
+{%block stylesheet%}
+<style>
+    video{
+        height: 50%;
+        width: 50%;
+        object-fit: contain;
+    }
+    #chat-box{
+        overflow-x: auto;
+        overflow-y: auto; 
+        position:   relative;
+        height:     70%;
+        width:   70%;
+        bottom: 0;   
+    }
+
+    #chat-content{
+        position: absolute;
+    }
+
+    #enterEvent{
+        width:   70%;
+    }
+
+</style>
 {% endblock %}
 
 {% block content %}
-    <div id="videos-container"></div>
+    <div class="ui centered alignment segment stackable grid container">
+        <div id="videos-container" class="ui twelve wide column">
+
+        </div>
+        <div class="ui four wide column">
+                <div class="column"> 
+                        <div class="ui header">Live Chat</div> 
+    
+                        <div class="ui top attached scrolling segment" id="chat-box">
+                            <div id="chat-content">
+                                <div class="ui comments">
+                                    <div class="comment" id ="cmnt" >
+                                    <!--all the chat information -->
+                                    </div>
+                                </div>                               
+                            </div>
+                        </div>
+    
+                        <div class="ui attached segment" id="enterEvent">
+                            <div class="ui small fluid search input">
+                                <input id="texts" placeholder="CHAT..." type="text">
+                            </div>                           
+                        </div>
+                </div>  
+
+        </div>
+        
+
+    </div>
+    <button class="ui inverted red button" id="multiBroadcastEndButton">End</button>
+    {% if broadcaster %}
+    <ul>
+        <p>Invite List</p>
+        {% for user in users_list %}
+            <li><button class="ui teal button" id="inviteToRoom" onclick="return inviteToRoom('{{ user.username }}')">{{ user.username }}</button></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% include 'home/base.html' %}
 {% endblock %}

@@ -6,12 +6,13 @@
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 var PHONE = window.PHONE = function(config) {
     config.ssl        = true; // Force HTTPS
+    config.uuid = config.number + '-device'; // unique device id for a user
     var PHONE         = function(){};
     var pubnub        = PUBNUB(config);
     var pubkey        = config.publish_key   || 'demo';
     var snapper       = function(){ return ' ' }
     var subkey        = config.subscribe_key || 'demo';
-    var sessionid     = PUBNUB.uuid();
+    var sessionid     = pubnub.get_uuid();
     var mystream      = null;
     var myvideo       = document.createElement('video');
     var myconnection  = false;
@@ -400,6 +401,7 @@ var PHONE = window.PHONE = function(config) {
         var talk   = get_conversation(number);
 
         vid.setAttribute( 'autoplay', 'autoplay' );
+        vid.setAttribute('controls', 'controls');
         vid.setAttribute( 'data-number', number );
         vid.setAttribute('width', '100%');
         vid.setAttribute('height', '100%');
@@ -446,7 +448,9 @@ var PHONE = window.PHONE = function(config) {
             message    : receive,
             disconnect : disconnectcb,
             reconnect  : reconnectcb,
-            connect    : function() { onready(true) }
+            connect    : function() {
+                console.log('Subscribed to ' + config.number);
+                onready(true); }
         });
     }
 
@@ -617,7 +621,7 @@ var PHONE = window.PHONE = function(config) {
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // Main - Request Camera and Mic
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    getusermedia()
+    getusermedia();
 
     return PHONE;
 };
