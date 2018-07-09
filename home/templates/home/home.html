@@ -144,9 +144,11 @@
                         {% else %}
                             <tr><td>No friends.. Add some friends to call them !!!</td></tr>
                         {% endif %} {% endcomment %}
-                        <tr><th>Friends&nbsp;<button class="ui inverted blue button stop">Stop</button></th>
-                        <th>Action</th>
-                      </tr></thead>
+                        {% comment %} <tr><th>Friends&nbsp;<button class="ui inverted blue button stop">Stop</button></th> {% endcomment %}
+                        <tr>
+                            <th>Friends</th>
+                            <th>Action</th>
+                        </tr></thead>
                       <tbody class="scrollContent" id='onlineuser'>
                         <tr><td>No friends.. Add some friends to call them !!!</td></tr>
                       </tbody>
@@ -181,7 +183,7 @@
                         {% else %}
                            <tr><td>No friends.. Add some friends to watch their stream !!!</td></tr>
                         {% endif %} {% endcomment %}
-                        <tr><td>No friends.. Add some friends to watch their stream !!!</td></tr>
+                        <tr><td>No Live Streams.. Follow some streams to watch them live !!!</td></tr>
                       </tbody>
                     </table>
                     </div>
@@ -191,39 +193,5 @@
     {% block call %}{% include 'home/call.html' %}{% include 'home/base.html' %}{% endblock %}
 {% endblock %}
 {% block stylesheet %}
-    <style>
-        div.tableContainer {
-	border: 1px solid #963;
-	overflow: auto;
-}
-
-    /* Reset overflow value to hidden for all non-IE browsers. */
-    html>body div.tableContainer {
-        overflow: hidden;
-        {#width: 900px#}
-        }
-
-    /* define width of table. IE browsers only                 */
-    div.tableContainer table {
-        float: left;
-        width: 740px
-    }
-
-    thead.fixedHeader tr {
-        position: relative;
-    }
-
-    html>body tbody.scrollContent {
-        display: block;
-        height: 350px;
-        overflow: auto;
-        width: 100%
-    }
-
-    html>body thead.fixedHeader {
-        display: table;
-        overflow: auto;
-        width: 100%
-    }
-    </style>
+    <link rel="stylesheet" href="{% static 'home/css/scrollable-table.css' %}">
 {% endblock %}

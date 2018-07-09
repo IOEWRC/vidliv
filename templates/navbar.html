@@ -31,8 +31,11 @@
                   <img src="{{ request.user.profile.get_avatar }}" class="ui small circular image" style="width: 35px;height: 35px">
                    <br /> <br />
 
-                &nbsp; {{ request.user.get_full_name }}
-
+                &nbsp; {% if not request.user.get_full_name %}
+                        {{request.user.username}}
+                        {%else%}
+                        {{request.user.get_full_name}}
+                        {%endif%}
               </a>
           
           
@@ -53,4 +56,4 @@
      {% endif %}
         
     </div>
-    </div>
+  </div>

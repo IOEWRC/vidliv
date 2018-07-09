@@ -1,0 +1,33 @@
+div.tableContainer {
+    border: 1px solid #963;
+    overflow: auto;
+}
+
+/* Reset overflow value to hidden for all non-IE browsers. */
+html>body div.tableContainer {
+    overflow: hidden;
+    /*{#width: 900px#}*/
+    }
+
+/* define width of table. IE browsers only                 */
+div.tableContainer table {
+    float: left;
+    width: 740px
+}
+
+thead.fixedHeader tr {
+    position: relative;
+}
+
+html>body tbody.scrollContent {
+    display: block;
+    height: 350px;
+    overflow: auto;
+    width: 100%
+}
+
+html>body thead.fixedHeader {
+    display: table;
+    overflow: auto;
+    width: 100%
+}
