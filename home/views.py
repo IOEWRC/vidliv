@@ -5,7 +5,13 @@ from django.urls import reverse
 from django.views.generic import TemplateView
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.core import serializers
 from .models import Friend
+import json
+from home.serializers import friendSerializer
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 # PubNub import
 from pubnub.pnconfiguration import PNConfiguration
@@ -79,15 +85,50 @@ def get_username(request):
         return JsonResponse(results)
 
 
-def get_followers(request):
-    if request.is_ajax():
+# def get_followers(request):
+#     if request.is_ajax():
+#         # PubNub instance
+#         pnconfig = PNConfiguration()
+#         pnconfig.subscribe_key = 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda'
+#         pnconfig.publish_key = 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792'
+#         pnconfig.ssl = True
+#         pubnub = PubNub(pnconfig)
+
+#         friend = Friend.objects.get(current_user__username__exact=request.user.username)
+#         followers = friend.friend_list.all()
+#         results = {'results': []}
+#         for follower in followers:
+#             envelope = pubnub.where_now().uuid(follower.username + '-device').sync()
+#             if follower.username in envelope.result.channels:
+#                 profile_image = follower.profile.get_avatar
+#                 follower_json = {
+#                     'username': follower.username,
+#                     'fullname': follower.get_full_name(),
+#                     'profile_image': profile_image,
+#                     'profile_url': reverse('user_profile', kwargs={'username': follower.username})
+#                 }
+#                 results['results'].append(follower_json)
+#             else:
+#                 continue
+#         return JsonResponse(results)
+       
+class FriendList(APIView):
+    """
+    List all the friends following,
+    """
+        
+    def get(self, request, format=None):
+        # friend, created = Friend.objects.get_or_create(current_user= self.request.user)
+        # friends = friend.friend_list.all()
+        # friends = Friend.objects.filter(current_user=self.request.user)
+        # print(self.request.user)
+        # serializer = friendSerializer(friends, many=True)
         # PubNub instance
         pnconfig = PNConfiguration()
         pnconfig.subscribe_key = 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda'
         pnconfig.publish_key = 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792'
         pnconfig.ssl = True
         pubnub = PubNub(pnconfig)
-
         friend = Friend.objects.get(current_user__username__exact=request.user.username)
         followers = friend.friend_list.all()
         results = {'results': []}
@@ -104,4 +145,14 @@ def get_followers(request):
                 results['results'].append(follower_json)
             else:
                 continue
-        return JsonResponse(results)
+        # print(results['results'])
+        # def dumper(obj):
+        #     try:
+        #         return obj.toJSON()
+        #     except:
+        #         return obj.__dict__
+        #data = json.dumps(results['results'], default=dumper, indent=1)
+        #data = serializers.serialize('json', results['results'])
+        data = results['results']
+        print(data)
+        return Response(data)

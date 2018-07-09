@@ -6,6 +6,7 @@
     <script src="{% static 'home/js/pubnub.js' %}"></script>
     <script src="{% static 'home/js/webrtc.js' %}"></script>
     <script src="{% static 'home/js/rtc-controller.js' %}"></script>
+    <script src="{% static 'home/js/home.js'%}"></script>
     <script type="text/javascript">
         {% if messages %}
             {% for message in messages %}
@@ -105,29 +106,7 @@
                }
             });
         }
-        function fetchFollowers(){
-            $.ajax({
-                type: "GET",
-                url: '{% url "home:getFollowers" %}',
-                success: (data)=>{
-                    var datas = data.results;
-                    console.log(datas);
-                    datas.forEach((follower)=>{
-                        {#console.log(follower);#}
-                        var header = $('#header');
-                        /*header.append("<img src='" + follower.profile_image +"'class='ui mini rounded image' >" +
-                        '<div>@<a href="' + follower.profile_url + '"class="username">'+ follower.username + '</a></div>');
-                        $('#callButton').append('<button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall(' + follower.username + ')">Call</button>'+ '<br>');*/
-                    })
-                },
-                complete: (data)=>{
-                    setTimeout(fetchFollowers, 15000);
-                }
-            })
-        }
-        $(document).ready(()=>{
-            setTimeout(fetchFollowers, 15000);
-        });
+        
     </script>
 {% endblock %}
 
@@ -140,9 +119,9 @@
         <div class="ui stackable grid container">
             <div class="eight wide column">
                     <div id="userList" class="tableContainer">
-                        <table class="ui teal table green scrollTable">
+                        <table class="ui teal table green scrollTable myTable">
                       <thead class="fixedHeader">
-                        <tr><th>Online Friends</th>
+                        {% comment %} <tr><th>Online Friends</th>
                         <th></th>
                       </tr></thead>
                       <tbody class="scrollContent">
@@ -164,7 +143,12 @@
                             {% endfor %}
                         {% else %}
                             <tr><td>No friends.. Add some friends to call them !!!</td></tr>
-                        {% endif %}
+                        {% endif %} {% endcomment %}
+                        <tr><th>Friends&nbsp;<button class="ui inverted blue button refresh">Refresh</button></th>
+                        <th>Action</th>
+                      </tr></thead>
+                      <tbody class="scrollContent" id='onlineuser'>
+                        <tr><td><label> Data :</label> <span id="data"></span></td></tr>
                       </tbody>
                     </table>
                     </div>
@@ -183,10 +167,12 @@
                                   <td>
                                     <h4 class="ui image header">
                                         <img src="{{ usr.profile.get_avatar }}" class="ui mini rounded image" >
-                                        <div class='name'><a href="{% url 'user_profile' usr %}" >{{ usr.get_full_name }}</a></div>
-                
-                                        <div>@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
-                                  </h4></td>
+                                        <div class='content'>
+                                            <a href="{% url 'user_profile' usr %}" class="name">{{ usr.get_full_name }}</a>
+                                        <div class="sub header">@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
+                                        </div>
+                                    </h4>
+                                  </td>
                                   <td>
                                     <button type="button" class="ui red button" onclick="watchLive('{{ usr.username }}', '{% url "home:watchlive" username=usr.username %}')"><i class="play icon"></i>WatchLive</button>
                                   </td>

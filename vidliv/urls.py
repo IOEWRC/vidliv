@@ -25,7 +25,7 @@ from registration.views import view_profile
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('registration.backends.default.urls')),
-    path('home/', include('home.urls')),
+    path('', include('home.urls')),
     path('', extra_views.landing_page, name='landing_page'),
     path('user/<str:username>', view_profile, name='user_profile'),
     path('favicon.ico', RedirectView.as_view(url=staticfiles_storage.url('img/favicon.ico')), name='favicon'),
