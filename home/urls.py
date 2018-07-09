@@ -11,7 +11,7 @@ urlpatterns = [
     path('broadcast/<str:username>/', views.broadcast_view, name='watchlive'),
     path('friends/<str:operation>/<int:pk>/', views.friend_operation, name='friendOperation'),
     path('api/get_username/', views.get_username, name='searchAutoComplete'),
-    # path('api/get_followers/', views.get_followers, name='getFollowers'),
-    path('api/get_friend_list/', views.FriendList.as_view(), name='friendlists'),
+    path('api/get_streamers_list/', views.StreamList.as_view(), name='getStreamers'),
+    #path('api/get_friend_list/', views.FriendList.as_view(), name='friendlists'),
     path('api/get_caller_list/', views.CallerList.as_view(), name='callerList'),
 ]
