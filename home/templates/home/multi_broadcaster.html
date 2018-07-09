@@ -212,11 +212,15 @@
                 document.getElementById('cmnt').innerHTML +=  '<a class="ui image avatar"><img src="'+ message.data.image + '" ></a>'+
                 '<div class="content"><a class="' + 'author">' + message.data.sender+ '</a><div id=' + '"text_content" class="text"><p class=" ui label">' + message.data.text + '</p></div></div>'; 
             }
-    
-
         } 
-
-        //$('video').wrapall("<div class='ui six wide column segment'></div>")
+        window.setInterval(function() {
+            var elem = document.getElementById('chat-box');
+            elem.scrollTop = elem.scrollHeight;
+          }, 1000);
+         $('.ui.toggle.button').click(function(){
+            $('.ui.sidebar').sidebar('toggle');
+         });
+;
     </script>
 
 {% endblock %}
@@ -231,8 +235,8 @@
         overflow-x: auto;
         overflow-y: auto; 
         position:   relative;
-        height:     70%;
-        width:   70%;
+        height:     80%;
+        width:   100%;
         bottom: 0;   
     }
 
@@ -241,50 +245,48 @@
     }
 
     #enterEvent{
-        width:   70%;
+        width:   100%;
     }
 
 </style>
 {% endblock %}
 
 {% block content %}
-    <div class="ui centered alignment segment stackable grid container">
+    <div style="height: auto"class="ui centered alignment segment stackable grid container">
         <div id="videos-container" class="ui twelve wide column">
-
         </div>
         <div class="ui four wide column">
-                <div class="column"> 
-                        <div class="ui header">Live Chat</div> 
-    
-                        <div class="ui top attached scrolling segment" id="chat-box">
-                            <div id="chat-content">
-                                <div class="ui comments">
-                                    <div class="comment" id ="cmnt" >
-                                    <!--all the chat information -->
-                                    </div>
-                                </div>                               
+                <div class="ui header">Live Chat</div> 
+                <div class="ui top attached segment" id="chat-box">
+                    <div id="chat-content">
+                        <div class="ui comments">
+                            <div class="comment" id ="cmnt" >
+                            <!--all the chat information -->
                             </div>
-                        </div>
-    
-                        <div class="ui attached segment" id="enterEvent">
-                            <div class="ui small fluid search input">
-                                <input id="texts" placeholder="CHAT..." type="text">
-                            </div>                           
-                        </div>
-                </div>  
-
+                        </div>                               
+                    </div>
+                </div>
+        <div class="ui bottom attached segment" id="enterEvent">
+            <div class="ui small fluid search input">
+                <input id="texts" placeholder="CHAT..." type="text">
+            </div>                           
         </div>
-        
-
+        <button class="ui inverted red button" id="multiBroadcastEndButton">End</button>       
+        <button class="ui teal toggle button">Invite Friends</button>
+        </div>
     </div>
-    <button class="ui inverted red button" id="multiBroadcastEndButton">End</button>
-    {% if broadcaster %}
-    <ul>
-        <p>Invite List</p>
-        {% for user in users_list %}
-            <li><button class="ui teal button" id="inviteToRoom" onclick="return inviteToRoom('{{ user.username }}')">{{ user.username }}</button></li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+        <div class="ui sidebar vertical menu">
+            
+            
+            {% if broadcaster %}
+            <ul><h class="ui header">Friends list</h>
+                {% for user in users_list %}
+                    <p><button class="ui teal vertical button" id="inviteToRoom" onclick="return inviteToRoom('{{ user.username }}')">{{ user.username }}</button></p>
+                {% endfor %}
+            </ul>
+            {% endif %}  
+         </div> 
+
+    
     {% include 'home/base.html' %}
 {% endblock %}
