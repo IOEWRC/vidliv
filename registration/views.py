@@ -181,16 +181,28 @@ class ApprovalView(TemplateView):
 
 
 def view_profile(request, username=None):
-    if request.user.username == username:
-        return redirect('user_profile_self')
-    if username:
-        user = get_object_or_404(User, username=username)
-    else:
-        user = request.user
+    current_user = User.objects.get(username=username)
+    # to get request.user following
     friend, created = Friend.objects.get_or_create(current_user=request.user)
-    friends = friend.friend_list.all()
-    return render(request, 'registration/user_profile.html', {'user': user, 'friends': friends})
+    following_request_user = friend.friend_list.all()
+    # to get users who follow username
+    followers = []
+    users = User.objects.exclude(username=username)
+    for user in users:
+        friend, created = Friend.objects.get_or_create(current_user=user)
+        following_user = friend.friend_list.all()
+        if current_user in following_user:
+            followers.append(user)
 
+    # to get username following
+    friend, created = Friend.objects.get_or_create(current_user=current_user)
+    following = friend.friend_list.all()
+    if User.objects.filter(username=username).exists():
+        user = User.objects.get(username=username)
+        return render(request, 'registration/user_profile.html', {'user': user, 'following': following,
+                                                                  'followers': followers, 'following_request_user': following_request_user})
+    else:
+        return render(request, 'registration/user_not_found.html', {'username': username})
 
 
 def edit_profile(request):

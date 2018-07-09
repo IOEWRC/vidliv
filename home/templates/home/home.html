@@ -5,6 +5,7 @@
     <script src="{% static 'home/js/pubnub.js' %}"></script>
     <script src="{% static 'home/js/webrtc.js' %}"></script>
     <script src="{% static 'home/js/rtc-controller.js' %}"></script>
+    <script src="{% static 'home/js/home.js'%}"></script>
     <script type="text/javascript">
         {% if messages %}
             {% for message in messages %}
@@ -117,6 +118,7 @@
                 window.location.replace(window.location.protocol + '//' + window.location.host + message.roomUrl);
             });
         }
+        
     </script>
 {% endblock %}
 
@@ -129,40 +131,38 @@
         <div class="ui stackable grid container">
             <div class="eight wide column">
                     <div id="userList" class="tableContainer">
-                        <table class="ui teal table green scrollTable">
+                        <table class="ui teal table green scrollTable myTable">
                       <thead class="fixedHeader">
-                        <tr><th>Friends</th>
+                        {% comment %} <tr><th>Online Friends</th>
                         <th></th>
                       </tr></thead>
                       <tbody class="scrollContent">
                         {% if view.friend_list %}
                             {% for usr in view.friend_list %}
-                                 <tr>
-                                  <td>
-                                    <h4 class="ui image header">
-                                            {% if not usr.profile.avatar %}
-                                            {% if usr.profile.get_gender_display == "Male" %}
-                                            <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
-                                            {% elif usr.profile.get_gender_display == "Female" %}
-                                            <img src="{% static 'img/molly.png' %}" class="ui mini rounded image">
-                                            {%endif%}
-                                            
-                                            {% else %}
-                                                <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image" >
-                                                 <br /> <br />
-                                            {% endif %}
-                                        <div class='name'><a href="{% url 'user_profile' usr %}" >{{ usr.get_full_name }}</a></div>
-                
-                                        <div>@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
-                                  </h4></td>
-                                  <td>
-                                    <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
-                                  </td>
-                                </tr>
+                                <tr>
+                                    <td>
+                                        <h4 class="ui image header" id="header">
+                                            <img src="{{ usr.profile.get_avatar }}" class="ui mini rounded image" >
+    {#                                                 <br />#}
+                                            <div class='name'><a href="{% url 'user_profile' usr %}" >{{ usr.get_full_name }}</a></div>
+    {##}
+                                            <div>@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
+                                        </h4></td>
+                                      <td id="callButton">
+                                        <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
+                                      </td>
+                                    </tr>
                             {% endfor %}
                         {% else %}
                             <tr><td>No friends.. Add some friends to call them !!!</td></tr>
-                        {% endif %}
+                        {% endif %} {% endcomment %}
+                        {% comment %} <tr><th>Friends&nbsp;<button class="ui inverted blue button stop">Stop</button></th> {% endcomment %}
+                        <tr>
+                            <th>Friends</th>
+                            <th>Action</th>
+                        </tr></thead>
+                      <tbody class="scrollContent" id='onlineuser'>
+                        <tr><td>No friends.. Add some friends to call them !!!</td></tr>
                       </tbody>
                     </table>
                     </div>
@@ -171,30 +171,22 @@
                     <div id="userList1" class="tableContainer">
                         <table class="ui teal table green scrollTable">
                       <thead class="fixedHeader">
-                        <tr><th>Streamers</th>
+                        <tr><th>Online Streamers</th>
                         <th></th>
                       </tr></thead>
-                      <tbody class="scrollContent">
-                        {% if view.friend_list %}
+                      <tbody class="scrollContent" id="streamers">
+                        {% comment %} {% if view.friend_list %}
                             {% for usr in view.friend_list %}
                                  <tr>
                                   <td>
                                     <h4 class="ui image header">
-                                            {% if not usr.profile.avatar %}
-                                            {% if usr.profile.get_gender_display == "Male" %}
-                                            <img src="{% static 'img/matthew.png' %}" class="ui mini rounded image">
-                                            {% elif usr.profile.get_gender_display == "Female" %}
-                                            <img src="{% static 'img/molly.png' %}" class="ui mini rounded image">
-                                            {%endif%}
-
-                                            {% else %}
-                                                <img src="{{ usr.profile.avatar.url }}" class="ui mini rounded image" >
-                                                 <br /> <br />
-                                            {% endif %}
-                                        <div class='name'><a href="{% url 'user_profile' usr %}" >{{ usr.get_full_name }}</a></div>
-                
-                                        <div>@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
-                                  </h4></td>
+                                        <img src="{{ usr.profile.get_avatar }}" class="ui mini rounded image" >
+                                        <div class='content'>
+                                            <a href="{% url 'user_profile' usr %}" class="name">{{ usr.get_full_name }}</a>
+                                        <div class="sub header">@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
+                                        </div>
+                                    </h4>
+                                  </td>
                                   <td>
                                     <button type="button" class="ui red button" onclick="watchLive('{{ usr.username }}', '{% url "home:watchlive" username=usr.username %}')"><i class="play icon"></i>WatchLive</button>
                                   </td>
@@ -202,7 +194,8 @@
                             {% endfor %}
                         {% else %}
                            <tr><td>No friends.. Add some friends to watch their stream !!!</td></tr>
-                        {% endif %}
+                        {% endif %} {% endcomment %}
+                        <tr><td>No Live Streams.. Follow some streams to watch them live !!!</td></tr>
                       </tbody>
                     </table>
                     </div>
@@ -212,39 +205,5 @@
     {% block call %}{% include 'home/call.html' %}{% include 'home/base.html' %}{% endblock %}
 {% endblock %}
 {% block stylesheet %}
-    <style>
-        div.tableContainer {
-	border: 1px solid #963;
-	overflow: auto;
-}
-
-    /* Reset overflow value to hidden for all non-IE browsers. */
-    html>body div.tableContainer {
-        overflow: hidden;
-        {#width: 900px#}
-        }
-
-    /* define width of table. IE browsers only                 */
-    div.tableContainer table {
-        float: left;
-        width: 740px
-    }
-
-    thead.fixedHeader tr {
-        position: relative;
-    }
-
-    html>body tbody.scrollContent {
-        display: block;
-        height: 350px;
-        overflow: auto;
-        width: 100%
-    }
-
-    html>body thead.fixedHeader {
-        display: table;
-        overflow: auto;
-        width: 100%
-    }
-    </style>
+    <link rel="stylesheet" href="{% static 'home/css/scrollable-table.css' %}">
 {% endblock %}
