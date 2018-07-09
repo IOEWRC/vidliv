@@ -72,7 +72,7 @@ def get_username(request):
         for user in users:
             profile_image = user.profile.get_avatar
             username_json = {
-                'username': user.ussername,
+                'username': user.username,
                 'fullname': user.get_full_name(),
                 'profile_image': profile_image,
                 'profile_url': reverse('user_profile', kwargs={'username': user.username})

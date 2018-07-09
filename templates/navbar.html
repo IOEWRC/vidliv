@@ -30,11 +30,10 @@
 
               <img src="{{ request.user.profile.get_avatar }}" class="ui small circular image" style="width: 35px;height: 35px">
                <br /> <br />
-          {% endif %}
-            &nbsp; {{ request.user.get_full_name }}
+
+            &nbsp; <div>{{ request.user.get_full_name }}</div>
 
           </a>
-          
           
         <div class=" ui dropdown item"><i class="settings icon"></i>
           Settings
@@ -50,6 +49,8 @@
           </div>
           </div>
           </div>
+            {% endif %}
+
         
     </div>
     </div>
