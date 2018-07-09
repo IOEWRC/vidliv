@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
-from django.templatetags.static import static
 from django.urls import reverse
 from django.views.generic import TemplateView
+from django.http import Http404
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.db.models import Q
 from .models import Friend
@@ -40,7 +40,7 @@ def broadcast_view(request, username=None):
     pnconfig.publish_key = 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792'
     pnconfig.ssl = True
 
-    pubnub =PubNub(pnconfig)
+    pubnub = PubNub(pnconfig)
     envelope = pubnub.where_now().uuid(username + '-device').sync()
     if username + '-stream' not in envelope.result.channels:
         messages.info(request, username + ' is not streaming', extra_tags=username + ' status')
@@ -72,10 +72,38 @@ def get_username(request):
         for user in users:
             profile_image = user.profile.get_avatar
             username_json = {
-                'username': user.username,
+                'username': user.ussername,
                 'fullname': user.get_full_name(),
                 'profile_image': profile_image,
                 'profile_url': reverse('user_profile', kwargs={'username': user.username})
             }
             results['results'].append(username_json)
         return JsonResponse(results)
+
+
+def multi_broadcast(request, action=None, username=None):
+    # TODO replace this "pass all users as available user to invite in room"
+    users = {'users_list': User.objects.all().exclude(username=request.user.username)}
+    if not username:
+        return render(request, 'home/multi_broadcaster.html', {**users, **{
+            'broadcaster': True,
+            'roomid': request.user.username + '-stream_room',
+            'roomInitiator': True,
+        }})
+    elif username and action == 'view':
+        if username == request.user.username:
+            return redirect('home:gomultibroadcast')
+        return render(request, 'home/multi_broadcaster.html', {**users, **{
+            'broadcaster': False,
+            'roomid': username + '-stream_room',
+            'roomInitiator': False,
+        }})
+    elif username and action == 'join':
+        if username == request.user.username:
+            return redirect('home:gomultibroadcast')
+        return render(request, 'home/multi_broadcaster.html', {**users, **{
+            'broadcaster': True,
+            'roomid': username + '-stream_room',
+            'roomInitiator': False,
+        }})
+    raise Http404
