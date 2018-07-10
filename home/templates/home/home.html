@@ -129,7 +129,7 @@
         </div>
         <hr>
         <div class="ui stackable grid container">
-            <div class="eight wide column">
+            <div class="five wide column">
                     <div id="userList" class="tableContainer">
                         <table class="ui teal table green scrollTable myTable">
                       <thead class="fixedHeader">
@@ -167,7 +167,7 @@
                     </table>
                     </div>
             </div>
-            <div class="eight wide column">
+            <div class="six wide column">
                     <div id="userList1" class="tableContainer">
                         <table class="ui teal table green scrollTable">
                       <thead class="fixedHeader">
@@ -196,6 +196,44 @@
                            <tr><td>No friends.. Add some friends to watch their stream !!!</td></tr>
                         {% endif %} {% endcomment %}
                         <tr><td>No Live Streams.. Follow some streams to watch them live !!!</td></tr>
+                      </tbody>
+                    </table>
+                    </div>
+            </div>
+            <div class="five wide column">
+                    <div id="userList" class="tableContainer">
+                        <table class="ui teal table green scrollTable myTable">
+                      <thead class="fixedHeader">
+                        {% comment %} <tr><th>Online Friends</th>
+                        <th></th>
+                      </tr></thead>
+                      <tbody class="scrollContent">
+                        {% if view.friend_list %}
+                            {% for usr in view.friend_list %}
+                                <tr>
+                                    <td>
+                                        <h4 class="ui image header" id="header">
+                                            <img src="{{ usr.profile.get_avatar }}" class="ui mini rounded image" >
+    {#                                                 <br />#}
+                                            <div class='name'><a href="{% url 'user_profile' usr %}" >{{ usr.get_full_name }}</a></div>
+    {##}
+                                            <div>@<a href="{% url 'user_profile' usr %}" class="username">{{usr.username}}</a></div>
+                                        </h4></td>
+                                      <td id="callButton">
+                                        <button type="button" class="ui inverted teal button" id="myBtn" onclick="return startCall('{{ usr.username }}')">Call</button>
+                                      </td>
+                                    </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td>No friends.. Add some friends to call them !!!</td></tr>
+                        {% endif %} {% endcomment %}
+                        {% comment %} <tr><th>Friends&nbsp;<button class="ui inverted blue button stop">Stop</button></th> {% endcomment %}
+                        <tr>
+                            <th>Rooms</th>
+                            <th>Action</th>
+                        </tr></thead>
+                      <tbody class="scrollContent" id='onlineroom'>
+                        <tr><td>No Online rooms to view....</td></tr>
                       </tbody>
                     </table>
                     </div>

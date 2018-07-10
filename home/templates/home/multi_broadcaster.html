@@ -127,6 +127,7 @@
                    afterConnectingSocket();
                    pubnub.subscribe({
                        channel: '{{ request.user.username }}' + '-inroom',
+                       message: () => {},
                        connect: () => {
                            console.log('Subscribed to pubnub-room');
                        }

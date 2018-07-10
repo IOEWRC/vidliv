@@ -140,7 +140,8 @@ def multi_broadcast(request, action=None, username=None):
 #             else:
 #                 continue
 #         return JsonResponse(results)
-       
+
+
 class FriendList(APIView):
     """
     List all the friends following,
@@ -187,8 +188,6 @@ class FriendList(APIView):
         return Response(data)
 
 
-
-
 class CallerList(APIView):
     """
     List all the friends you follow and get follow back
@@ -230,8 +229,6 @@ class CallerList(APIView):
                 continue
         data = results['results']
         return Response(data)
-
-
 
 
 class StreamList(APIView):
@@ -279,4 +276,37 @@ class StreamList(APIView):
         #data = serializers.serialize('json', results['results'])
         data = results['results']
         #print(data)
+        return Response(data)
+
+
+class RoomList(APIView):
+    """
+    List all the friends following,
+    """
+
+    def get(self, request, format=None):
+        pnconfig = PNConfiguration()
+        pnconfig.subscribe_key = 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda'
+        pnconfig.publish_key = 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792'
+        pnconfig.ssl = True
+        pubnub = PubNub(pnconfig)
+
+        friend = Friend.objects.get(current_user__username__exact=request.user.username)
+        room_list = friend.friend_list.all()
+        results = {'results': []}
+        for room in room_list:
+            envelope = pubnub.where_now().uuid(room.username + '-device').sync()
+            if room.username + '-stream' in envelope.result.channels:
+                profile_image = room.profile.get_avatar
+                room_json = {
+                    'username': room.username,
+                    'fullname': room.get_full_name(),
+                    'profile_image': profile_image,
+                    'profile_url': reverse('user_profile', kwargs={'username': room.username}),
+                    'room_url': reverse('home:gomultibroadcast')
+                }
+                results['results'].append(room_json)
+            else:
+                continue
+        data = results['results']
         return Response(data)
