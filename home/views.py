@@ -296,7 +296,7 @@ class RoomList(APIView):
         results = {'results': []}
         for room in room_list:
             envelope = pubnub.where_now().uuid(room.username + '-device').sync()
-            if room.username + '-stream' in envelope.result.channels:
+            if room.username + '-inroom' in envelope.result.channels:
                 profile_image = room.profile.get_avatar
                 room_json = {
                     'username': room.username,
