@@ -6,7 +6,7 @@ from .base import INSTALLED_APPS
 DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
-INSTALLED_APPS += ['sslserver', ]
+INSTALLED_APPS += ['sslserver', 'django_extensions', ]
 
 DATABASES = {  # set ENV `DATABASE_NAME' to `postgresql' to use otherwise it will use default sqllite3
     # replace with your own database credential
