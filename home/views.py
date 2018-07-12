@@ -114,78 +114,6 @@ def multi_broadcast(request, action=None, username=None):
             'roomInitiator': False,
         }})
     raise Http404
-# def get_followers(request):
-#     if request.is_ajax():
-#         # PubNub instance
-#         pnconfig = PNConfiguration()
-#         pnconfig.subscribe_key = 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda'
-#         pnconfig.publish_key = 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792'
-#         pnconfig.ssl = True
-#         pubnub = PubNub(pnconfig)
-
-#         friend = Friend.objects.get(current_user__username__exact=request.user.username)
-#         followers = friend.friend_list.all()
-#         results = {'results': []}
-#         for follower in followers:
-#             envelope = pubnub.where_now().uuid(follower.username + '-device').sync()
-#             if follower.username in envelope.result.channels:
-#                 profile_image = follower.profile.get_avatar
-#                 follower_json = {
-#                     'username': follower.username,
-#                     'fullname': follower.get_full_name(),
-#                     'profile_image': profile_image,
-#                     'profile_url': reverse('user_profile', kwargs={'username': follower.username})
-#                 }
-#                 results['results'].append(follower_json)
-#             else:
-#                 continue
-#         return JsonResponse(results)
-
-
-class FriendList(APIView):
-    """
-    List all the friends following,
-    """
-        
-    def get(self, request, format=None):
-        # friend, created = Friend.objects.get_or_create(current_user= self.request.user)
-        # friends = friend.friend_list.all()
-        # friends = Friend.objects.filter(current_user=self.request.user)
-        # print(self.request.user)
-        # serializer = friendSerializer(friends, many=True)
-        # PubNub instance
-        pnconfig = PNConfiguration()
-        pnconfig.subscribe_key = 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda'
-        pnconfig.publish_key = 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792'
-        pnconfig.ssl = True
-        pubnub = PubNub(pnconfig)
-        friend = Friend.objects.get(current_user__username__exact=request.user.username)
-        followers = friend.friend_list.all()
-        results = {'results': []}
-        for follower in followers:
-            envelope = pubnub.where_now().uuid(follower.username + '-device').sync()
-            if follower.username in envelope.result.channels:
-                profile_image = follower.profile.get_avatar
-                follower_json = {
-                    'username': follower.username,
-                    'fullname': follower.get_full_name(),
-                    'profile_image': profile_image,
-                    'profile_url': reverse('user_profile', kwargs={'username': follower.username})
-                }
-                results['results'].append(follower_json)
-            else:
-                continue
-        # print(results['results'])
-        # def dumper(obj):
-        #     try:
-        #         return obj.toJSON()
-        #     except:
-        #         return obj.__dict__
-        #data = json.dumps(results['results'], default=dumper, indent=1)
-        #data = serializers.serialize('json', results['results'])
-        data = results['results']
-        # print(data)
-        return Response(data)
 
 
 class CallerList(APIView):
@@ -233,15 +161,10 @@ class CallerList(APIView):
 
 class StreamList(APIView):
     """
-    List all the friends following,
+    List all the friends following who is streaming
     """
         
     def get(self, request, format=None):
-        # friend, created = Friend.objects.get_or_create(current_user= self.request.user)
-        # friends = friend.friend_list.all()
-        # friends = Friend.objects.filter(current_user=self.request.user)
-        # print(self.request.user)
-        # serializer = friendSerializer(friends, many=True)   
         pnconfig = PNConfiguration()
         pnconfig.subscribe_key = 'sub-c-2ebd9ad8-6cdb-11e8-902b-b2b3cb3accda'
         pnconfig.publish_key = 'pub-c-84d6b42f-9d4d-48c1-b5a7-c313289e1792'
@@ -266,22 +189,13 @@ class StreamList(APIView):
                 results['results'].append(streamer_json)
             else:
                 continue
-        # print(results['results'])
-        # def dumper(obj):
-        #     try:
-        #         return obj.toJSON()
-        #     except:
-        #         return obj.__dict__
-        #data = json.dumps(results['results'], default=dumper, indent=1)
-        #data = serializers.serialize('json', results['results'])
         data = results['results']
-        #print(data)
         return Response(data)
 
 
 class RoomList(APIView):
     """
-    List all the friends following,
+    List all the friends following who opened a room
     """
 
     def get(self, request, format=None):
@@ -296,14 +210,14 @@ class RoomList(APIView):
         results = {'results': []}
         for room in room_list:
             envelope = pubnub.where_now().uuid(room.username + '-device').sync()
-            if room.username + '-stream' in envelope.result.channels:
+            if room.username + '-inroom' in envelope.result.channels:
                 profile_image = room.profile.get_avatar
                 room_json = {
                     'username': room.username,
                     'fullname': room.get_full_name(),
                     'profile_image': profile_image,
                     'profile_url': reverse('user_profile', kwargs={'username': room.username}),
-                    'room_url': reverse('home:gomultibroadcast')
+                    'room_url': reverse('home:multistreamaction', kwargs={'action': 'view', 'username': room.username})
                 }
                 results['results'].append(room_json)
             else:
